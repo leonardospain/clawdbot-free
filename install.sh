@@ -109,9 +109,15 @@ install() {
 
   install_ollama_if_missing
 
+  if [ -f "${PWD}/docker-compose.yml" ]; then
+    run cp "${PWD}/docker-compose.yml" "${INSTALL_DIR}/docker-compose.yml"
+    log "COPIA: docker-compose.yml -> ${INSTALL_DIR}/docker-compose.yml"
+  fi
+
   log "INSTALL: completado"
   log "Siguiente paso"
-  log "Abre una issue en GitHub si quieres que el instalador también arranque servicios"
+  log "Arranca: docker compose -f ${INSTALL_DIR}/docker-compose.yml up -d"
+  log "Comprueba: curl -fsSL http://localhost:11434/api/tags"
 }
 
 case "${MODE}" in
