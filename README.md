@@ -1,39 +1,39 @@
-# 🦞 Clawdbot MULTI-AGENTE
+# 🦞 clawdbot — Multi-Agente Autónomo Gratuito
 
-Tu asistente personal autónomo — 100% gratuito, sin APIs pagadas, sin foto/vídeo.
+**clawdbot** es tu asistente personal de código abierto con sistema multi-agente especializado. 100% gratuito, sin APIs pagadas, sin foto/vídeo. Repositorio oficial: **clawdbot-free**.
 
 > Modificado por Leonardo Spain (España)  
-> Repositorio público libre para todos
+> clawdbot: tu agente autónomo offline/híbrido para tareas inteligentes
 
 ---
 
-## 🔑 ¿Qué es?
+## 🔑 ¿Qué es clawdbot?
 
-Un sistema de **multi-agentes especializados** que:
+**clawdbot** es un sistema de **multi-agentes especializados** que funciona 100% en tu máquina:
 - 🧠 **Coordinador**: decide qué agente usar según tu tarea
 - 🔍 **Investigador**: busca datos actuales (hoteles, vuelos, emergencias)
 - 📊 **Analista**: razonamiento profundo y comparaciones lógicas
 - ⚡ **Ejecutor**: sugiere acciones proactivas ("¿reservo este hotel?")
 - 🧠 **Memoria**: recuerda tus preferencias a largo plazo (90 días)
 
-**Sin foto/vídeo** — solo texto inteligente y acción.
+**clawdbot** no procesa fotos ni vídeos — solo texto inteligente y acción autónoma.
 
 ---
 
-## ✅ Características
+## ✅ Características de clawdbot
 
 | Característica | Detalle |
 |----------------|---------|
-| **100% gratuito** | Sin suscripciones, sin APIs pagadas |
-| **Offline/Híbrido** | Base offline + búsquedas online solo cuando es necesario |
-| **Privacidad** | Tus datos nunca salen de tu máquina |
-| **Multi-idioma** | Español por defecto (configurable) |
-| **Acceso flexible** | LAN local o Tailscale (opcional) |
-| **7 modelos LLM** | Desde ultra-mini (400MB) hasta estándar (4.7GB) |
+| **100% gratuito** | Sin suscripciones, sin APIs pagadas — clawdbot es libre |
+| **Offline/Híbrido** | clawdbot funciona offline + búsquedas online solo cuando es necesario |
+| **Privacidad** | Tus datos nunca salen de tu máquina — clawdbot respeta tu privacidad |
+| **Multi-idioma** | clawdbot en español por defecto (configurable) |
+| **Acceso flexible** | clawdbot accesible vía LAN local o Tailscale (opcional) |
+| **7 modelos LLM** | clawdbot compatible con Qwen, Mistral, Phi, Llama3 (todos gratuitos) |
 
 ---
 
-## ⚙️ Requisitos previos
+## ⚙️ Requisitos para clawdbot
 
 ```
 # Ubuntu/Debian
@@ -43,17 +43,17 @@ sudo apt install nodejs npm git curl -y
 brew install node git curl
 ```
 
-> Node.js 18+ requerido. Ollama se instala automáticamente si no existe.
+> Node.js 18+ requerido. clawdbot instala Ollama automáticamente si no existe.
 
 ---
 
-## 🚀 Instalación
+## 🚀 Instalar clawdbot
 
 ```
 curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash
 ```
 
-O descarga manualmente:
+O manualmente:
 
 ```
 git clone https://github.com/leonardospain/clawdbot-free.git
@@ -62,55 +62,48 @@ chmod +x install.sh
 ./install.sh
 ```
 
-El instalador te guiará paso a paso:
-1. Elige tu modelo LLM (7 opciones gratuitas)
+El instalador de **clawdbot** te guía paso a paso:
+1. Elige tu modelo LLM para clawdbot (7 opciones gratuitas)
 2. Selecciona modo: offline puro o híbrido inteligente
 3. Puerto HTTP (por defecto: 8765)
-4. IP detectada automáticamente (puedes cambiarla si quieres)
+4. IP detectada automáticamente por clawdbot
 5. Acceso: LAN local o Tailscale (opcional)
 
 ---
 
-## ▶️ Uso
+## ▶️ Usar clawdbot
 
-### Iniciar el Multi-Agente
+### Iniciar clawdbot
 ```
 clawdbot start
 ```
 
-### Acceder desde navegador
-El instalador muestra tu URL directa:
+### Acceder a clawdbot
 ```
 http://<tu-ip>:8765
 ```
 Ejemplo: `http://192.168.18.50:8765`
 
-### Detener el Multi-Agente
+### Detener clawdbot
 ```
 clawdbot stop
 ```
 
 ---
 
-## 🧹 Desinstalación
+## 🧹 Desinstalar clawdbot
 
 ```
 curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/uninstall.sh | bash
 ```
 
-O manualmente:
-```
-chmod +x uninstall.sh
-./uninstall.sh
-```
-
-> ⚠️ Pide confirmación explícita antes de eliminar nada. Tus archivos personales están a salvo.
+> clawdbot pide confirmación explícita antes de eliminar nada. Tus archivos personales están a salvo.
 
 ---
 
-## 🌐 Modo Híbrido Inteligente
+## 🌐 Modo Híbrido Inteligente de clawdbot
 
-El agente decide **automáticamente** cuándo necesita internet:
+**clawdbot** decide automáticamente cuándo necesita internet:
 - ✅ **Busca online** para: precios actuales, hoteles/vuelos, emergencias, eventos 2025-2026
 - ❌ **Nunca busca online** para: preguntas generales, razonamiento lógico, tareas offline
 
@@ -118,13 +111,13 @@ Búsquedas sin API keys — solo DuckDuckGo y Brave Search.
 
 ---
 
-## 📦 Modelos LLM gratuitos disponibles
+## 📦 Modelos LLM compatibles con clawdbot
 
 | Modelo | Tamaño | Recomendado para |
 |--------|--------|------------------|
 | Qwen3 0.6B | ~400MB | Raspberry Pi, máquinas muy limitadas |
 | Qwen3 1.7B | ~1GB | Rendimiento rápido en PCs antiguos |
-| Qwen3 4B | ~2.3GB | Equilibrio calidad/velocidad (recomendado) |
+| Qwen3 4B | ~2.3GB | Equilibrio calidad/velocidad (recomendado para clawdbot) |
 | Qwen3 8B | ~4.7GB | Máxima calidad en PCs modernos |
 | Mistral 7B | ~4.1GB | Excelente razonamiento lógico |
 | Phi-3.5-mini | ~2.1GB | Ultra-ligero (Microsoft) |
@@ -132,19 +125,25 @@ Búsquedas sin API keys — solo DuckDuckGo y Brave Search.
 
 ---
 
-## ⚠️ Aviso legal
+## ⚠️ Aviso legal de clawdbot
 
-- 100% software libre y gratuito
-- Sin recopilación de datos personales
-- Sin APIs pagadas ni suscripciones ocultas
-- Sin procesamiento de imágenes/vídeo
-- Código abierto y auditables
+- clawdbot es 100% software libre y gratuito
+- clawdbot no recopila datos personales
+- clawdbot no usa APIs pagadas ni suscripciones ocultas
+- clawdbot no procesa imágenes/vídeo
+- clawdbot es código abierto y auditables
 
 ---
 
-## 🇪🇸 Soporte
+## 🔍 Keywords para búsqueda (clawdbot)
+
+clawdbot, clawdbot-free, multi-agente, agente autónomo, LLM local, offline AI, Qwen, Mistral, privacidad AI, asistente personal, sin APIs pagadas, España, Leonardo Spain
+
+---
+
+## 🇪🇸 Soporte clawdbot
 
 Problemas o sugerencias: abre un *Issue* en este repositorio.
 
-> Modificado por Leonardo Spain (España)  
-> ✉️ Repositorio: https://github.com/leonardospain/clawdbot-free
+> clawdbot modificado por Leonardo Spain (España)  
+> ✉️ Repositorio oficial clawdbot: https://github.com/leonardospain/clawdbot-free
