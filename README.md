@@ -125,6 +125,80 @@ Búsquedas sin API keys — solo DuckDuckGo y Brave Search.
 
 ---
 
+## 🎯 5 Ejemplos de Uso con clawdbot
+
+### Ejemplo 1: Buscar hotel
+```
+Tú: "Necesito hotel en Madrid para mañana, máximo 80€"
+
+clawdbot (Investigador + Analista):
+"Buscando hoteles...
+✓ Hotel A: 75€ (4.2★) - 1km centro
+✓ Hotel B: 79€ (4.5★) - 3km centro ← RECOMENDADO
+
+clawdbot (Ejecutor):
+¿Reservo el Hotel B o busco más opciones?"
+```
+
+### Ejemplo 2: Emergencia médica
+```
+Tú: "Me duele el pecho, ¿qué hago?"
+
+clawdbot (Investigador):
+"⚠️ Esto requiere atención médica inmediata.
+Hospitales cercanos:
+• Hospital La Paz: 917277000 (urgencias 24h)
+• Hospital Gregorio Marañón: 914268000
+
+clawdbot:
+Llama al 112 ahora mismo. ¿Necesitas que busque rutas?"
+```
+
+### Ejemplo 3: Comparar precios
+```
+Tú: "¿Vale la pena comprar iPhone 16 ahora o esperar?"
+
+clawdbot (Investigador + Analista):
+"Buscando precios actuales y rumores...
+• iPhone 15 Pro: 1.199€ (disponible)
+• iPhone 16 esperado: septiembre 2025
+• Análisis: Espera si puedes. El 15 Pro tiene 95% de las funciones del 16.
+
+clawdbot (Ejecutor):
+¿Quieres que busque ofertas del 15 Pro hoy?"
+```
+
+### Ejemplo 4: Recordar preferencias
+```
+Tú: "Siempre busco hoteles con piscina"
+
+clawdbot (Memoria):
+"✅ Guardado: Prefieres hoteles con piscina.
+Próxima búsqueda incluirá este filtro."
+
+[3 días después]
+Tú: "Hotel en Valencia para el fin de semana"
+
+clawdbot (Memoria + Investigador):
+"Buscando hoteles con piscina en Valencia...
+✓ Hotel Las Arenas: 89€ (4.6★) - piscina exterior"
+```
+
+### Ejemplo 5: Tarea offline (sin internet)
+```
+Tú: "Explícame la teoría de la relatividad"
+
+clawdbot (Analista - offline):
+"La relatividad de Einstein tiene dos partes:
+1. Especial (1905): espacio y tiempo son relativos
+2. General (1915): gravedad = curvatura del espacio-tiempo
+
+Ejemplo simple: Si viajas a la velocidad de la luz,
+el tiempo pasa más lento para ti que para alguien en la Tierra."
+```
+
+---
+
 ## ⚠️ Aviso legal de clawdbot
 
 - clawdbot es 100% software libre y gratuito
