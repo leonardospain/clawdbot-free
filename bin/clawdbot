@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+INSTALL_DIR="${HOME}/.clawdbot"
+WORKSPACE="${INSTALL_DIR}/workspace"
+LOG_DIR="${INSTALL_DIR}/logs"
+
+mkdir -p "${WORKSPACE}" "${LOG_DIR}"
+
+usage() {
+  echo "Uso:"
+  echo "  clawdbot agent \"tarea\""
+  echo "  clawdbot status"
+  echo "  clawdbot logs"
+  echo "  clawdbot purge"
+}
+
+require_ollama() {
+  if ! curl -fsSL http://localhost:11434/api/tags >/dev/null 2>&1; then
+    echo "ERROR: Ollama no responde en http://localhost:11434"
+    echo "Arranca: docker compose -f ${INSTALL_DIR}/docker-compose.yml up -d"
+    exit 1
+  fi
+}
+
+slugify() {
+  echo "$1" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//;s/-$//'
+}
+
+agent() {
+  local task="${1:-}"
+  if [ -z "${task}" ]; then
+    echo "ERROR: falta tarea"
+    usage
+    exit 1
+  fi
+
+  require_ollama
+
+  local ts slug run_dir
+  ts="$(date '+%Y%m%d-%H%M%S')"
+  slug="$(slugify "${task}")"
+  [ -z "${slug}" ] && slug="task"
+  run_dir="${WORKSPACE}/${ts}-${slug}"
+
+  mkdir -p "${run_dir}/output" "${run_dir}/logs"
+  printf '%s\n' "${task}" > "${run_dir}/task.txt"
+
+  local prompt payload
+  prompt=$(cat <<'P'
+Eres un agente local. Genera un plan en JSON.
+Reglas:
+- No borres nada.
+- No modifiques archivos fuera de workspace.
+- Si una acción requiere confirmación humana, marca requires_confirmation true.
+Devuelve SOLO JSON con este formato:
+{
+  "goal": "...",
+  "steps": [
+    {"id": 1, "action": "...", "tool": "local|shell|file", "requires_confirmation": false, "expected_output": "..."}
+  ]
+}
+P
+)
+
+  payload=$(python3 - <<'PY' "${prompt}" "${task}"
+import json,sys
+prompt=sys.argv[1]
+task=sys.argv[2]
+print(json.dumps({
+  "model":"qwen2.5:1.5b",
+  "prompt": prompt + "\n\nTAREA:\n" + task,
+  "stream": False
+}))
+PY
+)
+
+  curl -fsSL http://localhost:11434/api/generate \
+    -H 'Content-Type: application/json' \
+    -d "${payload}" \
+    > "${run_dir}/plan.raw.json" 2>/dev/null || true
+
+  if [ ! -s "${run_dir}/plan.raw.json" ]; then
+    python3 - <<'PY' "${task}" > "${run_dir}/plan.json"
+import json,sys
+task=sys.argv[1]
+print(json.dumps({
+  "goal": task,
+  "steps": [{
+    "id": 1,
+    "action": "Crear salida en workspace",
+    "tool": "file",
+    "requires_confirmation": False,
+    "expected_output": "Archivos en output/"
+  }]
+}, ensure_ascii=False, indent=2))
+PY
+  else
+    python3 - <<'PY' "${run_dir}/plan.raw.json" "${run_dir}/plan.json" 2>/dev/null || true
+import json,sys
+src=sys.argv[1]; dst=sys.argv[2]
+d=json.load(open(src))
+txt=(d.get("response") or "").strip()
+open(dst,"w").write(txt if txt else json.dumps(d, ensure_ascii=False, indent=2))
+PY
+  fi
+
+  echo "OK: ${run_dir}"
+  echo "Plan: ${run_dir}/plan.json"
+}
+
+status_cmd() {
+  echo "Workspace: ${WORKSPACE}"
+  echo "Compose: ${INSTALL_DIR}/docker-compose.yml"
+  if curl -fsSL http://localhost:11434/api/tags >/dev/null 2>&1; then
+    echo "Ollama: OK"
+  else
+    echo "Ollama: NO"
+  fi
+}
+
+logs_cmd() {
+  ls -la "${WORKSPACE}" | tail -n 20
+}
+
+purge_cmd() {
+  printf 'Confirmar borrado total de %s ? [s/N]: ' "${INSTALL_DIR}"
+  read -r CONFIRM
+  case "${CONFIRM}" in
+    s|S) rm -rf "${INSTALL_DIR}"; echo "OK: borrado" ;;
+    *) echo "Cancelado" ;;
+  esac
+}
+
+cmd="${1:-}"
+shift || true
+case "${cmd}" in
+  agent) agent "${*:-}" ;;
+  status) status_cmd ;;
+  logs) logs_cmd ;;
+  purge) purge_cmd ;;
+  *) usage; exit 1 ;;
+esac

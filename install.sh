@@ -106,6 +106,12 @@ install() {
   run mkdir -p "${INSTALL_DIR}"
   run mkdir -p "${INSTALL_DIR}/workspace"
   run mkdir -p "${INSTALL_DIR}/templates"
+  run mkdir -p "${INSTALL_DIR}/bin"
+  if [ -f "${PWD}/bin/clawdbot" ]; then
+    run cp "${PWD}/bin/clawdbot" "${INSTALL_DIR}/bin/clawdbot"
+    run chmod +x "${INSTALL_DIR}/bin/clawdbot"
+    log "COPIA: clawdbot -> ${INSTALL_DIR}/bin/clawdbot"
+  fi
 
   install_ollama_if_missing
 
