@@ -126,7 +126,16 @@ PY
   fi
 
   echo "OK: ${run_dir}"
-  echo "Plan: ${run_dir}/plan.json"
+  echo "Plan: /plan.json"
+
+  if ! python3 "/bin/validate_plan.py" "/plan.json" > "/logs/validate.log" 2>&1; then
+    echo "Plan inválido. Usando plan seguro"
+    python3 - <<'PY' "" > "/plan.json"
+import json,sys
+task=sys.argv[1]
+print(json.dumps({"goal": task, "steps": [{"id": 1, "tool": "file_write_workspace", "requires_confirmation": False, "expected_output": "Archivo output/result.txt", "path": "output/result.txt", "content": "placeholder"}]}, ensure_ascii=False, indent=2))
+PY
+  fi
 
   echo "Ejecutando pasos seguros"
   "${PWD}/bin/executor.sh" "${run_dir}/plan.json"
