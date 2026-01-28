@@ -64,11 +64,12 @@ P
 )
 
   payload=$(python3 - <<'PY' "${prompt}" "${task}"
-import json,sys
+import json,sys,os
 prompt=sys.argv[1]
 task=sys.argv[2]
+model=os.environ.get("CLAW_MODEL","qwen2.5:1.5b")
 print(json.dumps({
-  "model":"${CLAW_MODEL:-qwen2.5:1.5b}"
+  "model": model,
   "prompt": prompt + "\n\nTAREA:\n" + task,
   "stream": False
 }))
@@ -96,9 +97,10 @@ print(json.dumps({
 }, ensure_ascii=False, indent=2))
 PY
   else
-    python3 - <<'PY' "${run_dir}/plan.raw.json" "${run_dir}/plan.json" 2>/dev/null || true
+    python3 - <<'PY' "${run_dir}/plan.raw.json" "${run_dir}/plan.json"
 import json,sys
-src=sys.argv[1]; dst=sys.argv[2]
+src=sys.argv[1]
+dst=sys.argv[2]
 d=json.load(open(src))
 txt=(d.get("response") or "").strip()
 open(dst,"w").write(txt if txt else json.dumps(d, ensure_ascii=False, indent=2))
