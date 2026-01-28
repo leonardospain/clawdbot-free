@@ -48,18 +48,35 @@ agent() {
 
   local prompt payload
   prompt=$(cat <<'P'
-Eres un agente local. Genera un plan en JSON.
-Reglas:
-- No borres nada.
-- No modifiques archivos fuera de workspace.
-- Si una acción requiere confirmación humana, marca requires_confirmation true.
-Devuelve SOLO JSON con este formato:
+Eres un agente local. Genera SOLO un plan en JSON con formato estructurado.
+
+Formato requerido:
 {
   "goal": "...",
   "steps": [
-    {"id": 1, "action": "...", "tool": "local|shell|file", "requires_confirmation": false, "expected_output": "..."}
+    {
+      "id": 1,
+      "tool": "file_write_workspace|file_read|shell|docker",
+      "requires_confirmation": false,
+      "expected_output": "...",
+
+      "path": "output/result.txt",
+      "content": "texto",
+
+      "cmd": "ls -la",
+      "cwd": "workspace"
+    }
   ]
 }
+
+Reglas:
+- No inventes tools.
+- Para file_write_workspace: usa path y content. No uses action.
+- Para file_read: usa path. No uses action.
+- Para shell: usa cmd y pon requires_confirmation true.
+- Para docker: usa cmd y pon requires_confirmation true.
+- path siempre debe ser relativa dentro de workspace, por ejemplo output/result.txt.
+Devuelve SOLO JSON. Nada más.
 P
 )
 
@@ -89,10 +106,11 @@ print(json.dumps({
   "goal": task,
   "steps": [{
     "id": 1,
-    "action": "Crear salida en workspace",
-    "tool": "file",
+    "tool": "file_write_workspace",
     "requires_confirmation": False,
-    "expected_output": "Archivos en output/"
+    "expected_output": "Archivo output/result.txt",
+    "path": "output/result.txt",
+    "content": "placeholder"
   }]
 }, ensure_ascii=False, indent=2))
 PY
@@ -108,9 +126,10 @@ PY
   fi
 
   echo "OK: ${run_dir}"
-  echo "Plan: /plan.json"
+  echo "Plan: ${run_dir}/plan.json"
+
   echo "Ejecutando pasos seguros"
-  "${PWD}/bin/executor.sh" "/plan.json"
+  "${PWD}/bin/executor.sh" "${run_dir}/plan.json"
 }
 
 status_cmd() {
