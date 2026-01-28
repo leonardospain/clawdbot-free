@@ -1,223 +1,131 @@
-# 🦞 clawdbot — Multi-Agente Autónomo Gratuito
+# 🜠 clawdbot-free v2.0 - Multi-Step AI Agent 2026
 
-**clawdbot** es tu asistente personal de código abierto con sistema multi-agente especializado. 100% gratuito, sin APIs pagadas, sin foto/vídeo. Repositorio oficial: **clawdbot-free**.
+# “ English
 
-> Modificado por Leonardo Spain (España)  
-> clawdbot: tu agente autónomo offline/híbrido para tareas inteligentes
+## clawdbot-free v2.0 - Multi-Step AI Agent
 
----
+Your specialized AI agent system with explicit permission before each action. 100% free, no paid API, no credit cards.
 
-## 🔑 ¿Qué es clawdbot?
+>> Modified by Leonardo Spain (Spain)
+>> clawdbot: multi-agent system for intelligent multi-step tasks
 
-**clawdbot** es un sistema de **multi-agentes especializados** que funciona 100% en tu máquina:
-- 🧠 **Coordinador**: decide qué agente usar según tu tarea
-- 🔍 **Investigador**: busca datos actuales (hoteles, vuelos, emergencias)
-- 📊 **Analista**: razonamiento profundo y comparaciones lógicas
-- ⚡ **Ejecutor**: sugiere acciones proactivas ("¿reservo este hotel?")
-- 🧠 **Memoria**: recuerda tus preferencias a largo plazo (90 días)
+## Reservation Workflow
 
-**clawdbot** no procesa fotos ni vídeos — solo texto inteligente y acción autónoma.
+You: "I want a table on Friday at 9 pm at Nobu Marbella"
 
----
+clawdbot (Researcher + Planner):
+- Search Nobu Marbella on Google Maps
+- Find contact: reservations.marbella@noburestaurants.com
+- Generate email draft with your details
+- † Send with your OK explísito
 
-## ✅ Características de clawdbot
-
-| Característica | Detalle |
-|----------------|---------|
-| **100% gratuito** | Sin suscripciones, sin APIs pagadas — clawdbot es libre |
-| **Offline/Híbrido** | clawdbot funciona offline + búsquedas online solo cuando es necesario |
-| **Privacidad** | Tus datos nunca salen de tu máquina — clawdbot respeta tu privacidad |
-| **Multi-idioma** | clawdbot en español por defecto (configurable) |
-| **Acceso flexible** | clawdbot accesible vía LAN local o Tailscale (opcional) |
-| **7 modelos LLM** | clawdbot compatible con Qwen, Mistral, Phi, Llama3 (todos gratuitos) |
-
----
-
-## ⚙️ Requisitos para clawdbot
-
-```
-# Ubuntu/Debian
-sudo apt install nodejs npm git curl -y
-
-# macOS (con Homebrew)
-brew install node git curl
-```
-
-> Node.js 18+ requerido. clawdbot instala Ollama automáticamente si no existe.
-
----
-
-## 🚀 Instalar clawdbot
-
-```
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash
-```
-
-O manualmente:
-
-```
-git clone https://github.com/leonardospain/clawdbot-free.git
-cd clawdbot-free
-chmod +x install.sh
-./install.sh
-```
-
-El instalador de **clawdbot** te guía paso a paso:
-1. Elige tu modelo LLM para clawdbot (7 opciones gratuitas)
-2. Selecciona modo: offline puro o híbrido inteligente
-3. Puerto HTTP (por defecto: 8765)
-4. IP detectada automáticamente por clawdbot
-5. Acceso: LAN local o Tailscale (opcional)
-
----
-
-## ▶️ Usar clawdbot
-
-### Iniciar clawdbot
-```
-clawdbot start
-```
-
-### Acceder a clawdbot
-```
-http://<tu-ip>:8765
-```
-Ejemplo: `http://192.168.18.50:8765`
-
-### Detener clawdbot
-```
-clawdbot stop
-```
-
----
-
-## 🧹 Desinstalar clawdbot
-
-```
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/uninstall.sh | bash
-```
-
-> clawdbot pide confirmación explícita antes de eliminar nada. Tus archivos personales están a salvo.
-
----
-
-## 🌐 Modo Híbrido Inteligente de clawdbot
-
-**clawdbot** decide automáticamente cuándo necesita internet:
-- ✅ **Busca online** para: precios actuales, hoteles/vuelos, emergencias, eventos 2025-2026
-- ❌ **Nunca busca online** para: preguntas generales, razonamiento lógico, tareas offline
-
-Búsquedas sin API keys — solo DuckDuckGo y Brave Search.
-
----
-
-## 📦 Modelos LLM compatibles con clawdbot
-
-| Modelo | Tamaño | Recomendado para |
-|--------|--------|------------------|
-| Qwen3 0.6B | ~400MB | Raspberry Pi, máquinas muy limitadas |
-| Qwen3 1.7B | ~1GB | Rendimiento rápido en PCs antiguos |
-| Qwen3 4B | ~2.3GB | Equilibrio calidad/velocidad (recomendado para clawdbot) |
-| Qwen3 8B | ~4.7GB | Máxima calidad en PCs modernos |
-| Mistral 7B | ~4.1GB | Excelente razonamiento lógico |
-| Phi-3.5-mini | ~2.1GB | Ultra-ligero (Microsoft) |
-| Llama3.2 3B | ~2GB | Alternativa Meta |
-
----
-
-## 🎯 5 Ejemplos de Uso con clawdbot
-
-### Ejemplo 1: Buscar hotel
-```
-Tú: "Necesito hotel en Madrid para mañana, máximo 80€"
-
-clawdbot (Investigador + Analista):
-"Buscando hoteles...
-✓ Hotel A: 75€ (4.2★) - 1km centro
-✓ Hotel B: 79€ (4.5★) - 3km centro ← RECOMENDADO
-
-clawdbot (Ejecutor):
-¿Reservo el Hotel B o busco más opciones?"
-```
-
-### Ejemplo 2: Emergencia médica
-```
-Tú: "Me duele el pecho, ¿qué hago?"
-
-clawdbot (Investigador):
-"⚠️ Esto requiere atención médica inmediata.
-Hospitales cercanos:
-• Hospital La Paz: 917277000 (urgencias 24h)
-• Hospital Gregorio Marañón: 914268000
+You: "Yes"
 
 clawdbot:
-Llama al 112 ahora mismo. ¿Necesitas que busque rutas?"
-```
+- Email sent to reservations.marbella@noburestaurants.com
+- Monitoring for response...
 
-### Ejemplo 3: Comparar precios
-```
-Tú: "¿Vale la pena comprar iPhone 16 ahora o esperar?"
+- Response received: "Your reservation is confirmed for Friday at 21:00"
+- † Add to Calendar with alarms (30min + 2h before)? (Y/n):
 
-clawdbot (Investigador + Analista):
-"Buscando precios actuales y rumores...
-• iPhone 15 Pro: 1.199€ (disponible)
-• iPhone 16 esperado: septiembre 2025
-• Análisis: Espera si puedes. El 15 Pro tiene 95% de las funciones del 16.
+You: "Yes"
 
-clawdbot (Ejecutor):
-¿Quieres que busque ofertas del 15 Pro hoy?"
-```
+clawdbot:
+- Event added to Calendar: "Diner Nobu Marbella" (Friday 21:00)
+- Alarms: 19:00 + 21:00
 
-### Ejemplo 4: Recordar preferencias
-```
-Tú: "Siempre busco hoteles con piscina"
+## 100% FREE GUARANTEE
 
-clawdbot (Memoria):
-"✅ Guardado: Prefieres hoteles con piscina.
-Próxima búsqueda incluirá este filtro."
+✠ No subscriptions, no paid APIs, no credit cards
+...
 
-[3 días después]
-Tú: "Hotel en Valencia para el fin de semana"
+# “ Espaáol
 
-clawdbot (Memoria + Investigador):
-"Buscando hoteles con piscina en Valencia...
-✓ Hotel Las Arenas: 89€ (4.6★) - piscina exterior"
-```
 
-### Ejemplo 5: Tarea offline (sin internet)
-```
-Tú: "Explícame la teoría de la relatividad"
+## clawdbot-free v2.0 - Agente IA Multi-Paso
 
-clawdbot (Analista - offline):
-"La relatividad de Einstein tiene dos partes:
-1. Especial (1905): espacio y tiempo son relativos
-2. General (1915): gravedad = curvatura del espacio-tiempo
+Agentes de IA specializados con permiso explícito antes de cada acción. 100% gratuito, sin API pagadas, sin tarjetas.
 
-Ejemplo simple: Si viajas a la velocidad de la luz,
-el tiempo pasa más lento para ti que para alguien en la Tierra."
-```
+>> Modificado por Leonardo Spain (España)
+>> clawdbot: sistema multi-agente para tareas inteligentes multi-paso
 
----
 
-## ⚠️ Aviso legal de clawdbot
+## Flujo de Reserva
 
-- clawdbot es 100% software libre y gratuito
-- clawdbot no recopila datos personales
-- clawdbot no usa APIs pagadas ni suscripciones ocultas
-- clawdbot no procesa imágenes/vídeo
-- clawdbot es código abierto y auditables
+Tú: "Necesito una mesa el viernes a las 9 de la noche en Nobu Marbella"
 
----
+clawdbot (Investigador + Planner):
+- Buscar Nobu Marbella en Google Maps
+- Extraer contacto: reservations.marbella@noburestaurants.com
+- Generar borrador de email con tus datos
+-† Enviar con tu OK explícito
 
-## 🔍 Keywords para búsqueda (clawdbot)
+Tú: "Sís"
+clawdbot:
+- Email enviado a reservations.marbella@noburestaurants.com
+- Monitoreando respuesta...
 
-clawdbot, clawdbot-free, multi-agente, agente autónomo, LLM local, offline AI, Qwen, Mistral, privacidad AI, asistente personal, sin APIs pagadas, España, Leonardo Spain
+- Respuesta recibida: "Su reserva está confirmada para viernes a 21:00"
+-† Añadir al Calendario con alarmas (30min + 2h antes)? (S/n):
 
----
+Dï: "Sís"
+clawdbot:
+- Evento añadido al Calendario: "Cena Nobu Marbella" (Viernes 21:00)
+- Alarmas: 19:00 + 21:00
 
-## 🇪🇸 Soporte clawdbot
+## 100% GRATUITO GARANTIZÁD
 
-Problemas o sugerencias: abre un *Issue* en este repositorio.
+✡ Sin suscripciones, sin API pagadas, sin tarjetas
+...
 
-> clawdbot modificado por Leonardo Spain (España)  
-> ✉️ Repositorio oficial clawdbot: https://github.com/leonardospain/clawdbot-free
+# “ Romána</a>
+
+
+## clawdbot-free v2.0 - Agent IA Multi-Pas
+
+Agenti de IA specializasi cu permisiune expli�8citá ínainte de fiecare de fiecare ac\u2004iuni. 100% gratuit, fòr API-uriplátite, féra tarjete de credit.
+
+>> Modificat de Leonardo Spain (Spania)
+>> clawdbot: sistem multi-agent pentru tarefile inteligente multi-pas
+
+
+## Fluj Reservare
+
+Du: "Asigura-míi o mesa viernea la ora 9 la Nobu Marbella"
+
+clawdbot (Cercetô2ar + Planner):
+- Cautô2are Nobu Marbella pe Google Maps
+- Extragere contact: reservations.marbella@noburestaurants.com
+- Generare borrador de email cu datele te
+-† Enviare cu permisiunea ta sa
+
+Du: "Ya"
+clawdbot:
+- Email trimis la reservations.marbella@noburestaurants.com
+- Monitoreare raspuns...
+
+- Raspuns primit: "Reservarea ta 9 la viernease a fost confirmata"
+-† AdáTu la Calendar cu alarme (30min + 2h inainte)? (D/n):
+
+Du: "Daca"
+clawdbot:
+- Event ad\u2014ugat la Calendar: "Cina Nobu Marbella" (Viernea 21:00)
+- Alarme: 19:00 + 21:00
+
+## 100% GRATUIT GARANTęAT
+
+✡ Fg, subscrip\u2004ii, fḓr API-uri pl\u2014tite, fòr tarjete de credit
+...
+
+## Instalar
+
+curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash
+
+## Uso
+
+clawdbot start    # Iniciar interfaz web
+clawdbot stop     # Detener
+clawdbot version   # Información (About)
+clawdbot update    # Actualizar (con tu permiso)
+
+clawdbot free - https://github.com/leonardospain/clawdbot-free
