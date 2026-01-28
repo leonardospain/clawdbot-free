@@ -52,3 +52,11 @@ Docs
 - docs/WHAT-IT-DOES.md
 - docs/MODE-AGENT-SPEC.md
 - docs/WINDOWS.md
+
+Modelo LLM
+Por defecto usa qwen2.5:1.5b.
+Descarga modelo:
+ollama pull qwen2.5:1.5b
+
+Cambiar modelo:
+CLAW_MODEL="qwen2.5:1.5b" ~/.clawdbot/bin/clawdbot agent "tarea"

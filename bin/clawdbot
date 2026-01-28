@@ -68,7 +68,7 @@ import json,sys
 prompt=sys.argv[1]
 task=sys.argv[2]
 print(json.dumps({
-  "model":"qwen2.5:1.5b",
+  "model":(os.environ.get("CLAW_MODEL") or "qwen2.5:1.5b"),
   "prompt": prompt + "\n\nTAREA:\n" + task,
   "stream": False
 }))
