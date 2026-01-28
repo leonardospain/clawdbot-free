@@ -20,6 +20,7 @@ mkdir -p "${WORKSPACE}" "${LOG_DIR}"
 
 usage() {
   echo "Uso:"
+  echo "  clawdbot new-task \"tarea\""
   echo "  clawdbot agent \"tarea\""
   echo "  clawdbot status"
   echo "  clawdbot doctor"
