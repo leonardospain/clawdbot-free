@@ -19,3 +19,9 @@ No incluye
 - No envío de emails
 - No calendarios
 - No reservas
+
+Modo Agent v0.2
+- Genera plan JSON
+- Ejecuta solo acciones seguras
+- Todo lo demás queda bloqueado
+- Salida siempre en workspace

@@ -108,7 +108,9 @@ PY
   fi
 
   echo "OK: ${run_dir}"
-  echo "Plan: ${run_dir}/plan.json"
+  echo "Plan: /plan.json"
+  echo "Ejecutando pasos seguros"
+  "${PWD}/bin/executor.sh" "/plan.json"
 }
 
 status_cmd() {
