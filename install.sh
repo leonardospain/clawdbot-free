@@ -1,27 +1,30 @@
 #! /bin/bash
 set -e
 
-# ğŸœ  clawdbot INSTANDAR MULTIPLATAFORMA â€“ Linux/macOS/WSL2 (Get Ollama)
-# Modificado por Leonardo Spain (EspaÃ­a)
-# Sin foto/vÃ­teo â€¢ Sin APIs pagadas â€¢ Solo texto + acciÃ³n
+# ğŸœ  clawdbot-free v2.0 - Agente IA Multi-Paso 2026
+# Modificado por Leonardo Spain (EspaÃ¡a)
+# 100% gratuito - No tarjetas - No pruebas - No datos recopilados
+# Licencia MIT - Codigo abierto - Privacidad total
+
 blue='\033[0;34m'
 green='\033[0;32m'
 yellow='\033[1;33m'
 red='\033[0;31m'
 nc='\033[0m'
 
-# --------------------------------------------------------
-# Detectar Plataforma
 # ---------------------------------------------------------
-os="$(uname -s)"
+# Detectar Plataforma
+# --------------------------------------------------------
+o=""
 arch="$(uname -m)"
 
 case "$os" in
   Linux*)    PLATFORM="linux";;
-  Darwin*)   PLATFORM="macos";;
-  CYGWIN* | MINDW*)
-    PLATFORM="windows-wsl";;
-  *)        PLATFORM="unknown";;
+  Darwin*)  PLATFORM="macos";;
+  CYGWIN*
+  PLATFORM="windows-wsl";;
+  MingW**) PLATFORM="windows-wsl";;
+  *)       PLATFORM="unknown";;
 esac
 
 # Check ollama
@@ -42,6 +45,8 @@ fi
 
 clawdir-$HOME/.clawdbot"
 mkdir -p "$clawdir"
+mkdir -p "$clawdir/workspace"
+mkdir -p "$clawdir/templates"
 
 function menu_checkbox() {
   local (arr)="$A"
@@ -50,9 +55,9 @@ function menu_checkbox() {
   local i key opt dir=""
   for i in "$@"; do selected_arr[+]=""; done
 
-  wile true; do
+  while true; do
     clear
-    echo "$yellow==========================================$nc"
+    echo "$yellow=========================================$nc"
     echo "$yellow= $title $nc"
     echo "$yellow========================================$nc"
     echo
@@ -85,88 +90,38 @@ function menu_checkbox() {
 }
 
 echo "$yellow=========================================$nc"
-echo "$yellowâ™¡ clawdbot Instalador Multiplataforma | $PLATFORM $nc"
-echo "$yellow=========================================$nc"
+echo "$yellowâ™  clawdbot-free v2.0 â€“ Agente IA Multi-Paso 2026 $nc"
+echo "$yellow========================================$nc"
 echo
 
-echo "âœ• Selecciona los agentes que quieras habilitar: "
+echo "âœ• FilosofÃ­a 100% gratuita: No tarjetas, no pruebas, no datos recopilados" 
 echo
 
-agents_arr=(
-  "Multi-Agentes basico (Coordinador, Investigador, Analista)"
-  "Comms-Agent (Emails/Redes sociales)"
-  "IoT-Agent (Control de dispositivos locales)"
-  "Secretary-Agent (Calendario, Alertas, InvestigaciÃ³n de proveedores)"
-  "Research-Agent (Precios, utilidades, comparativas)"
-  "Alert-Agent (Notificaciones push)"
-)
-
-menu_checkbox "çœ£ SelecciÃ³n principal" "${agents_arr[@]}"
-selected_agents="$(for i in "$(seq 0 $(({#agents_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == "*" ]] && echo "${i+1}"; done)"
-
-echo
-echo "$greenâ”” Agentes seleccionados: $selected_agents$nc"
+# --------------------------------------------------------
+# Selector de idioma
+# ---------------------------------------------------------
+echo "$yellowâœ• Selecciona tu idioma (100% gratuito): $nc"
 echo
 
-if [[ "$selected_agents" == *"1"* ]]; then
-	echo "$yellowâ™¡ Habilitando Multi-Agentes basico...$nc"
-	mkdir -p "$clawdir/agents"
-	curl -f ssL "https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/comms-agent.js" -o "$clawdir/agents/comms-agent.js" 2>/dev/null || true
-fi
-if [[ "$selected_agents" == *"2"* ]]; then
-	echo "$yellowâ™¡ Habilitando Comms-Agent...$nc"
-	comms_arr=("Gmail" "Telegram" "Reddit" "Outlook")
-
-	menu_checkbox "â™  Selecciona servicios Comms" "${comms_arr[@]}"
-	selected_comms="$(for i in "$(seq 0 $(({#comms_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == *"" ]] && echo "${i+1}"; done)"
-
-	sed -i 's/"comms_enabled": false/"comms_enabled": true/' "$clawdir/config.json"
-fi
-if [[ "$selected_agents" == *"3"* ]]; then
-	echo "$yellowâ™¡ Habilitando IoT-Agent...$nc"
-	iot_arr=("Home Assistant" "Philips Hue" "TP-Link Kasa" "MQTT")
-
-	menu_checkbox "â™  SelecciÃ³n dispositivos IoT" "${iot_arr[@]}"
-	selected_iot="$(for i in "$(seq 0 $(({#iot_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == *"" ]] && echo "${i+1}"; done)"
-
-	sed -i 's/"iot_enabled": false/"iot_enabled": true/' "$clawdir/config.json"
-fi
-if [[ "$selected_agents" == *"4"* ]]; then
-	echo "$yellowâ™¡ Habilitando Secretary-Agent...$nc"
-	secretary_arr=("Google Calendar" "Outlook Calendar" "Alertas programadas" "Investigar proveedores")
-
-	menu_checkbox "â™  SelecciÃ³n capacidades Secretary" "${secretary_arr[@]}"
-	selected_secretary="$(for i in "$(seq 0 $(({#secretary_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == "*" ]] && echo "${i+1}"; done)"
-
-	sed -i 's/"secretary_enabled": false/"secretary_enabled": true/' "$clawdir/config.json"
-fi
-if [[ "$selected_agents" == *"5"* ]]; then
-	echo "$yellowâ™  Habilitando Research-Agent...$nc"
-	research_arr=("Precios hoteles/supermarcados" "Comparativas utilidades" "Proveedores internet" "Precios crypto/acciones")
-
-	menu_checkbox "â™¡ Selecciona capacidades Research" "${research_arr[@]}"
-	selected_research="$(for i in "$(seq 0 $(({#research_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == *"" ]] && echo "${i+1}"; done)"
-
-	sed -i 's/"research_enabled": false/"research_enabled": true/' "$clawdir/config.json"
-fi
-if [[ "$selected_agents" == *"6"* ]]; then
-	echo "$yellowâ™¡ Habilitando Alert-Agent...$nc"
-	alert_arr=("Telegram" "Email alertas" "Desktop notifications")
-
-	menu_checkbox "â™¡ Selecciona canales Alert" "${alert_arr[@]}"
-	selected_alert="$(for i in "$(seq 0 $(({#alert_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == "*" ]] && echo "${i+1}"; done)"
-
-	sed -i 's/"alert_enabled": false/"alert_enabled": true/' "$clawdir/config.json"
+IfISO_ARR=("EspaÃ±ol (ESi" "Engles (EN)" "Rumano (RO)")
+menu_checkbox "âœ£ SelecciÃ³n de idioma" "${IfISO_ARR[@]}"
+selected_files="$(for i in "$(seq 0 $(({#IfISO_ARR[@]}-1)))"; do [[ "${selected_arr[i]}" == "*" ]] && echo "${i+1}"; done)"
+if [[ "$selected_files" == *"1"* ]]; then FILO="es";
+elif [[ "$selected_files" == *"2"* ]]; then FILO="en";
+elif [[ "$selected_files" == *"3"*" ]]; then FILO="ro";
+else file="en";
 fi
 
 echo
-"$green
-âœ• InstalaciÃ³n completada!
+echo "$greenâ”” Idioma seleccionado: $FILE nacional $nc"
+echo
 
-â”¬ Plataforma: $PLATFORM
 
-â”¬ Accede a http://<tu-ip>:8765
-â”¢ Tu datos nunca salen de tu mÃ¡quina sin tu permiso explÃ­cito
-â”¢ Cada agente te pegarÃ¡ permiso antes de actuar
-â”¢ Codigo abierto MIT - https://github.com/leonardospain/clawdbot-free
-$nc"
+# ---------------------------------------------------------
+# Selector de dominio
+# --------------------------------------------------------
+echo "$yellowâœ• Selecciona tu especializaciÃ³n (Agente Multi-Paso): $n"
+echo
+
+DOMAINS_ARR=("Viajes (Hoteles/sUvelos/Itinerarios)" "Negocios (Gastos/Proveedores/EfiÃ³ciencia)" "Inmobiliario (Propiedades/Clientes/Visitas)" "Legal (Documentos/Contratos)" "MÃ©dico (Emergencias/Recordatorios)" "Utilities (Luá½…Ì½Õ„¤ˆ€‰A•ÉÍ½¹…°€¡…±•¹‘…É¥¼½µ…¥±Ì¤ˆ€‰•¹Ñ”=Á•É…Ñ¥Ù¼€¡Q…É•…Ì5Õ±Ñ¤µA…Í¼¤ˆ¤()µ•¹Õ}¡•­‰½à€‹ŠrŒM•±•§Í¸‘”‘½µ¥¹¥¼ˆ€ˆ‘í=5%9M}IImuôˆ)Í•±•Ñ•‘}‘½µ…¥¹Ìôˆ¡™½È¤¥¸€ˆ¡Í•Ä€À€ ¡ì=5%9M}IImuô´Ä¤¤¤ˆì‘¼ml€ˆ‘íÍ•±•Ñ•‘}…ÉÉm¥uôˆ€ôô€ˆ¨ˆut€˜˜•¡¼€ˆ‘í¤¬Åôˆì‘½¹”¤ˆ()¥˜ml€ˆ‘Í•±•Ñ•‘}‘½µ…¥¹Ìˆ€ôô€¨ˆàˆ¨utìÑ¡•¸(€•¡¼€ˆ‘É••»ŠRP½µ¥¹¥¼Í•±•¥½¹…‘¼è•¹Ñ”=Á•É…Ñ¥Ù¼€´5½‘¼•¹Ñ”5Õ±Ñ¤µA…Í¼€‘¹Œˆ(€µ­‘¥È€µÀ€ˆ‘±…İ‘¥È½Ñ•µÁ±…Ñ•Ì½…•¹Ğˆ(€…Ğ€ø€ˆ‘±…İ‘¥È½Ñ•µÁ±…Ñ•Ì½…•¹Ğ½Í•½}…¹…±åÍ¥Ì¹ÑáĞˆ€ğğ€=)=‰©•Ñ¥Ù¼è¹…±¥é…ÈÕ¸Í¥Ñ¥¼İ•ˆ‘”M<()A…Í½Ìè(Ä¸•Í…É…È!Q50‘•°Í¥Ñ¥¼(È¸¹…±¥é…È•ÍÑÉÕÑÕÉ„€¡5•Ñ„Ñ…Ì°!•…‘¥¹Ì°±ĞÑ•áĞ¤(Ì¸	ÕÍ…Èµ•©½É•ÌÁË…Ñ¥…ÌM<€ÈÀÈØ(Ğ¸½µÁ…É…ÈÍ¥Ñ¥¼½¸µ•©½É•ÌÁË…Ñ¥…Ì(Ô¸•¹•É…È¥¹™½Éµ”•¸5…É­‘½İ¸()I•ÍÕ±Ñ…‘¼™¥¹…°è(´ÉÉ½É•ÌËµ‘¥½Ìèm1%MQt(´ÉÉ½É•Ìµ•‘¥½Ìèm1%MQt(´I•½µ•¹‘…¥½¹•Ìèm1%MQt)=œ)™¤()•¡¼(((Œ€´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´(ŒM•±•Ñ½È‘”µ•¹Í…©•Ëµ…Ì€¡A%ÌÉ…ÑÕ¥Ñ…Ì¤(Œ€´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´)•¡¼€ˆ‘å•±±½ßŠr%¹Ñ•É…§Í¸‘”µ•¹Í…©•Ëµ…Ì€¡A%Ì€ÄÀÀ”É…ÑÕ¥Ñ…Ì¤€‘¹Œˆ)•¡¼()5MM9I}IHô ‰Q•±•É…´ˆ€‰¥Í½Éˆ€‰5…ÑÉ¥àˆ¤)µ•¹Õ}¡•­‰½à€‹ŠrŒM•±•¥½¹„‘”µ•¹Í…©•Ë¥…Ìˆ€ˆ‘í5MM9I}IImuôˆ)Í•±•Ñ•‘}µ•ÍÍ•¹•ÉÌôˆ¡™½È¤¥¸€ˆ¡Í•Ä€À€ ¡ì5MM9I}IImuô´Ä¤¤¤ˆì‘¼ml€ˆ‘íÍ•±•Ñ•‘}…ÉÉm¥uôˆ€ôô€ˆ¨ˆut€˜˜•¡¼€ˆ‘í¤¬Åôˆì‘½¹”¤ˆ()•¡¼(((Œ€´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´(ŒM•±•Ñ½È‘”…Á…¥‘…‘•Ì(Œ€´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´)•¡¼€ˆ‘å•±±½ßŠr…Á…¥‘…‘•Ì‘”…•¹Ñ•Ì€ ÄÀÀ”É…ÑÕ¥Ñ…Ì¤è€‘¸ˆ)•¡¼()9QM}IHô (€€‰5Õ±Ñ¤µ•¹Ñ•Ì‹…Í¥¼€¡½½É‘¥¹…‘½È°%¹Ù•ÍÑ¥…‘½È°¹…±¥ÍÑ„¤ˆ(€€‰½µµÌµ•¹Ğ€¡µ…¥±Ì½I•‘•ÌÍ½¥…±•Ì¤ˆ(€€‰%½Pµ•¹Ğ€¡½¹ÑÉ½°‘”‘¥ÍÁ½Í¥Ñ¥Ù½Ì±½…±•Ì¤ˆ(€€‰M•É•Ñ…Éäµ•¹Ğ€¡…±•¹‘…É¥¼°±•ÉÑ…Ì¤ˆ(€€‰I•Í•…É µ•¹Ğ€¡AÉ•¥½Ì°½µÁ…É…Ñ¥Ù…Ì¤ˆ(€€‰±•ÉĞµ•¹Ğ€¡9½Ñ¥™¥…¥½¹•ÌÁÕÍ ¤ˆ(€€‰A±…¹¹•Èµ•¹Ğ€¡5½‘¼•¹Ñ”5Õ±Ñ¤µA…Í¼½¸ÑÔÁ•Éµ¥Í¼¤ˆ(¤)µ•¹Õ}¡•­‰½à€‹ŠrŒM•±•¥½¹„‘”…Á…¥‘…‘•Ìˆ€ˆ‘í9QM}IImuôˆ)Í•±•Ñ•‘}…•¹ÑÌôˆ¡™½È¤¥¸€ˆ¡Í•Ä€À€ ¡ì9QM}IImuô´Ä¤¤¤ˆì‘¼ml€ˆ‘íÍ•±•Ñ•‘}…ÉÉm¥uôˆ€ôô€ˆ¨ˆUt€˜˜•¡¼€ˆ‘í¤¬Åôˆì‘½¹”¤ˆ()¥˜ml€ˆ‘Í•±•Ñ•‘}…•¹ÑÌˆ€ôô€¨ˆØˆ¨utìÑ¡•¸(€•¡¼€ˆ‘É••»
+q°A±…¹¹•Èµ•¹Ğ¡…‰¥±¥Ñ…‘¼€´•¹Ñ”5Õ±Ñ¤µA…Í¼½¸Á•Éµ¥Í¼•áÁ³µ¥Ñ¼€‘¹Œˆ(€µ­‘¥È€µÀ€ˆ‘±…İ‘¥È½…•¹ÑÌˆ(€…Ğ€ø€ˆ‘±…İ‘¥È½…•¹ÑÌ½Á±…¹¹•Èµ…•¹Ğ¹©Ìˆ€ğğ€=)½¹ÍĞ™Ì€ôÉ•ÅÕ¥É” ‰™Ìˆ¤¹ÁÉ½µ¥Í•Ìì)½¹ÍĞÁ…Ñ €ôÉ•ÅÕ¥É” ‰Á…Ñ ˆ¤ì()±…ÍÌA±…¹¹•É•¹Ğì(€½¹ÍÑÉÕÑ½È ¤ì(€€€Ñ¡¥Ì¹İ½É­ÍÁ…”€ôÁ…Ñ ¹©½¥¸¡ÁÉ½•ÍÌ¹•¹Ø¹!=5°€ˆ¹±…İ‘‰½Ğˆ°€‰İ½É­ÍÁ…”ˆ¤ì(€ô((€…Íå¹ŒÁ±…¸¡½‰©•Ñ¥Ù”¤ì(€€€½¹ÍĞÁ±…¸€ô€)=‰©•Ñ¥Ù¼è€‘í½‰©•Ñ¥Ù•ô()•¹•É…ÈÁ±…¸‘”…¥½¹•ÌµÕ±Ñ¤µÁ…Í¼½¸Á•Éµ¥Í¼•áÁ³µ¥Ñ¼è(´A…Í¼€Äèm%=9|Åt(´A…Í¼€Èèm%=9|Ét(´A…Í¼€Ìèm%=9|Ít(´A…Í¼¸èm%=9}¹t()I•ÍÕ±Ñ…‘¼™¥¹…°èmIMU1Q=}%91t)€ì(€€€É•ÑÕÉ¸Á±…¸ì(€ô((€…Íå¹Œ•á•ÕÑ•MÑ•À¡ÍÑ•À°½¹™¥Éµ…±±‰…¬¤ì(€€€½¹ÍĞ½¹™¥Éµ•€ô…İ…¥Ğ½¹™¥Éµ…±±‰…¬¡ÍÑ•À¤ì(€€€¥˜€ …½¹™¥Éµ•¤ì(€€€€€½¹Í½±”¹±½œ ˆ‘íÉ•‘÷ŠrA…Í¼…‰½ÉÑ…‘¼Á½È•°•ÍÑ…‰±•¥µ¥•¹Ñ¼€´¹¥¹Õ¹„…§Í¸•©•ÕÑ…‘„ˆ¤ì(€€€€€É•ÑÕÉ¸™…±Í”ì(€€€ô(€€€É•ÑÕÉ¸ÑÉÕ”ì(€ô)ô()µ½‘Õ±”¹•áÁ½ÉÑÌ€ôA±…¹¹•É•¹Ğì)=œ)™¤()•¡¼)•¡¼€ˆ‘É••¸4+ŠrT%¹ÍÑ…±…§Í¸½µÁ±•Ñ…‘„„€‘¸ˆ)•¡¼()•¡¼€ˆ‘É••»ŠrT•‘”„¡ÑÑÀè¼¼ñÑÔµ¥ÀøèàÜØÔ€¡%¹Ñ•É™…èİ•ˆ¤€‘¹Œˆ)•¡¼€ˆ‘å•±±½ßŠrT=È½¹•Ñ„„±…İ‘‰½ĞÙ¥„€¨ÑÔµ•¹Í…©•Ëµ„Í•±•¥½¹…‘„€¨€‘¸ˆ)•¡¼()•¡¼€ˆ‘å•±±½ßŠR˜ÍÑ„¥¹ÍÑ…±…§Í¸•Ì€ÄÀÀ”É…ÑÕ¥Ñ„Á…É„Í¥•µÁÉ”¸ˆ)•¡¼€ˆ‘É•âœ¥M¤Õ¹„½Á§Í¸9<…Á…É•”•¸•ÍÑ”µ•»èèˆ)•¡¼€ˆ€€€9¼•ÍÓ„€ÄÀÀ”É…ÑÕ¥Ñ„¼Í•ÕÉ„¸ˆ)•¡¼€ˆ€€€9½ÌÉ•¡ÕÍ…µ½ÌÁ½ÈÁÉ¥¹¥Á¥¼ƒ¥Ñ¥¼¸‘¹Œˆ)•¡¼()•¡¼€ˆ‘É••¹9¼É•½Á¥±…µ½Ì‘…Ñ½Ì¸9¼½½­¥•Ì¸QÕÌ‘…Ñ½Ì•¸ÑÔ·…ÅÕ¥¹„¸)½‘¥¼…‰¥•ÉÑ¼5%P€´¡ÑÑÁÌè¼½¥Ñ¡Õˆ¹½´½±•½¹…É‘½ÍÁ…¥¸½±…İ‘‰½Ğµ™É•”‘¹Œˆ
