@@ -175,8 +175,18 @@ print(json.dumps({"goal": task, "steps": [{"id": 1, "tool": "file_write_workspac
 PY
   fi
 
+  if [ "20 20 12 61 79 80 81 702 701 33 98 100 204 250 395 398 399 400python3 - <<'PY' "/plan.json"
+import json,sys
+p=json.load(open(sys.argv[1]))
+print(len(p.get("steps",[])))
+PY
+)" -eq 0 ]; then
+    echo "Plan vacío. Nada que ejecutar."
+    exit 0
+  fi
+
   echo "Ejecutando pasos seguros"
-  "${EXECUTOR}" "${run_dir}/plan.json"
+  "" "/plan.json"
 }
 
 status_cmd() {
