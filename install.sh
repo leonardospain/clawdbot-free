@@ -1,93 +1,140 @@
 #! /bin/bash
 set -e
 
-# 🜠 clawdbot MULTI-AGENTE – Tu asistente personal autónomo
-# Modificado por Leonardo Spain (España)
-# Sin foto/vídeo • Sin API pagadas • Solo texto + acción
+# 🜠 clawdbot INSTANDAR INTERACTIVO – Tua multi-agente con checkboxes interactivos
+# Modificado por Leonardo Spain (Espaáa)
+# Sin foto/vídeo • Sin APIs pagadas • Solo texto + acción
+
 blue='\033[0;34m'
 green='\033[0;32m'
 yellow='\033[1;33m'
 red='\033[0;31m'
 nc='\033[0m'
 
-echo -e "$blue
-  🜠 clawdbot MULTI-AGENTE – Tu asistente personal autónomm
-  Modificado por Leonardo Spain (España)
-  Sin foto/vídeo • Sin API pagadas • Solo texto + acción
-$nc"
-
-# Detectar SI
-OS="$(uname -s)"
-ARCH="$(uname -m)"
-
-case "$OS" in
-  Linux*)   MACHINE=Linux;;
-  Darwin*)  MACHINE=macOS;;
-  *)       echo -e "$nc$ired
-\red Sistema no soportado - solor linux/macOS or windows con WSL" ; exit 1;;
-esac
-
-echo "$yellowInstalando dependencias...$nc"
-if [ "$MACHINE" = "Linux" ]; then
-  sudo apt update &> /dev/null
-sudo apt install -y curl git nodejs npm 2>/dev/null
-elif [ "$MACHINE" = "macOS" ]; then
-  brew install curl git node 2>/dev/null || true
-fi
-
-# Instalar Ollama
-if ! command -v ollama &> /dev/null; then
-  echo "$yellowInstalando Ollama...$nc"
-  curl https://ollama.ai/install.sh | bash
-fi
-
-# Crear directorio
 clawdir-$HOME/.clawdbot"
 mkdir -p "$clawdir"
 
-echo "$yellowDescargando agentes...$nc"
-curl -f ssL "https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/comms-agent.js" -o "$clawdir/comms-agent.js" 2>/dev/null || true
-curl -fssL "https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/comms-cli.js" -o "$clawdir/comms-cli.js" 2>/dev/null || true
+function menu_checkbox() {
+  local (arr)="$A"
+  local title="$1"; shift
+  local selected_arr=()
+  local i key opt dir=""
+  for i in "$@"; do selected_arr[+]=""; done
 
-# Crear config default�� ( echo '{'; echo '  "version": "1.0",'; echo '  "port": 8765,'; echo '  "model": "qwen:3.5m",; echo '  "mode": "hybrid",; echo '  "comms_enabled": false,; echo '  "iot_enabled": false,'; echo '  "privacy_mode": "strict"; echo '}' ) > "$clawdir/config.json"
+  while true; do
+    clear
+    echo "$yellow=========================================$nc"
+    echo "$yellow= $title $nc"
+    echo "$yellow========================================$nc"
+    echo
+    for i in "$( seq 0 $(({#arr[@]}-1)) )"; do
+      if [[ "${selected_arr[i]}" == "*" ]]; then
+        opt="$green* $nc $yellow${arr[i]}}$nc"
+      else
+        opt="    {$arr[i]}"
+      fi
+      echo "$(format "%02d. %s" $((i~1)) "$opt")"
+    done
+    echo
+    echo "$yellow♡ Flecho arriba/abajo: Navigar | Espacio: Seleccionar/Quitar | Enter: Confirmar $nc"
+    read -p "" -rs 1 key </dev/tty
+    case "$key" in
+        [ *]  if [[ "$dir" == "-" ]]; then dir="+"; else; dir="-"; fi; for i in "$(seq 0 $(({#arr[@]}-1)) )"; do
+          [[ "$i" -ge "$((({#arr[@]}-1)) )" -a "$i" -le "0" ]] && selected_arr[i]="$dir" && break
+        done;;
+        [ A | a ]  if [[ "${selected_arr[0]}" == "*" ]]; then selected_arr[0]=""; else; selected_arr[0]="*"; fi;;
+        [ ]  break;;
+        ( )  for i in "$(seq 0 $(({#arr[@]}-1)) )"; do
+            if [[ "${selected_arr[i]}" == "*" ]]; then selected_arr[i]=""; else; selected_arr[i]="*"; fi;
+        done;;
+    esac
+  done
 
-# Preguntar comms
-read -p "$(format "$yellow`🜨 Habilitar gestión de emails/redes sociales (Gmail, Telegram, Reddit)? [S/s]: $nc")" comms_answer
-comms_answer="$comms_answer: S"
+  for i in "$( seq 0 $(({#arr[@]}-1)) )"; do
+    [[ "${selected_arr[i]}" == "*" ]] && echo "${arr[i]}"
+  done
+}
 
-if [[ "$comms_answer" == *S[sS:]* ]]; then
-  echo "$green✕Comms-Agent habilitado$nc"
-  sed -i 's/"comms_enabled": false/"comms_enabled": true/' "$clawdir/config.json"
-else
-  echo "$yellow↧ Omitido Comms-Agent$nc"
+echo "$yellow=========================================$nc"
+echo "$yellow♡ clawdbot Instalador Interactivo $nc"
+echo "$yellow========================================$nc"
+echo
+echo "✕ Selecciona los agentes que quieras habilitar: "
+echo
+
+agents_arr=(
+  "Multi-Agentes basico (Coordinador, Investigador, Analista)"
+  "Comms-Agent (Emails/Redes sociales)"
+  "IoT-Agent (Control de dispositivos locales)"
+  "Secretary-Agent (Calendario, Alertas, Investigación de proveedores)"
+  "Research-Agent (Precios, utilidades, comparativas)"
+  "Alert-Agent (Notificaciones push)"
+)
+
+menu_checkbox "眣 Selección principal" "${agents_arr[@]}"
+selected_agents="$(for i in "$(seq 0 $(({#agents_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == "*" ]] && echo "${i+1}"; done)"
+
+echo
+echo "$green└ Agentes seleccionados: $selected_agents$nc"
+echo
+
+if [[ "$selected_agents" == *"1"* ]]; then
+	echo "$yellow♡ Habilitando Multi-Agentes basico...$nc"
+	mkdir -p "$clawdir/agents"
+	curl -f ssL "https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/comms-agent.js" -o "$clawdir/agents/comms-agent.js" 2>/dev/null || true
+fi
+if [[ "$selected_agents" == *"2"* ]]; then
+	echo "$yellow♡ Habilitando Comms-Agent...$nc"
+	comms_arr=("Gmail" "Telegram" "Reddit" "Outlook")
+
+	menu_checkbox "♠ Selecciona servicios Comms" "${comms_arr[@]}"
+	selected_comms="$(for i in "$(seq 0 $(({#comms_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == *"" ]] && echo "${i+1}"; done)"
+
+	sed -i 's/"comms_enabled": false/"comms_enabled": true/' "$clawdir/config.json"
+fi
+if [[ "$selected_agents" == *"3"* ]]; then
+	echo "$yellow♡ Habilitando IoT-Agent...$nc"
+	iot_arr=("Home Assistant" "Philips Hue" "TP-Link Kasa" "MQTT")
+
+	menu_checkbox "♠ Selección dispositivos IoT" "${iot_arr[@]}"
+	selected_iot="$(for i in "$(seq 0 $(({#iot_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == *"" ]] && echo "${i+1}"; done)"
+
+	sed -i 's/"iot_enabled": false/"iot_enabled": true/' "$clawdir/config.json"
+fi
+if [[ "$selected_agents" == *"4"* ]]; then
+	echo "$yellow♡ Habilitando Secretary-Agent...$nc"
+	secretary_arr=("Google Calendar" "Outlook Calendar" "Alertas programadas" "Investigar proveedores")
+
+	menu_checkbox "♠ Selección capacidades Secretary" "${secretary_arr[@]}"
+	selected_secretary="$(for i in "$(seq 0 $(({#secretary_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == "*" ]] && echo "${i+1}"; done)"
+
+	sed -i 's/"secretary_enabled": false/"secretary_enabled": true/' "$clawdir/config.json"
+fi
+if [[ "$selected_agents" == *"5"* ]]; then
+	echo "$yellow♠ Habilitando Research-Agent...$nc"
+	research_arr=("Precios hoteles/supermarcados" "Comparativas utilidades" "Proveedores internet" "Precios crypto/acciones")
+
+	menu_checkbox "♡ Selecciona capacidades Research" "${research_arr[@]}"
+	selected_research="$(for i in "$(seq 0 $(({#research_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == *"" ]] && echo "${i+1}"; done)"
+
+	sed -i 's/"research_enabled": false/"research_enabled": true/' "$clawdir/config.json"
+fi
+if [[ "$selected_agents" == *"6"* ]]; then
+	echo "$yellow♡ Habilitando Alert-Agent...$nc"
+	alert_arr=("Telegram" "Email alertas" "Desktop notifications")
+
+	menu_checkbox "♡ Selecciona canales Alert" "${alert_arr[@]}"
+	selected_alert="$(for i in "$(seq 0 $(({#alert_arr[@]}-1)))"; do [[ "${selected_arr[i]}" == "*" ]] && echo "${i+1}"; done)"
+
+	sed -i 's/"alert_enabled": false/"alert_enabled": true/' "$clawdir/config.json"
 fi
 
-# Preguntar IoT
-read  -p "$(format "$yellow❤ Habilitar control IoT local (Home Assistant, Philips Hue)? [S/s]: $nc")" iot_answer
-iot_answer="$iot_answer: S"
+echo
+"$green
+✕ Instalación completada!
 
-if [[ "$iot_answer" == *S[sS:]* ]]; then
-  echo "$green✥Iot-Agent habilitado$nc"
-  sed -i 's/"iot_enabled": false/"iot_enabled": true/' "$clawdir/config.json"
-else
-  echo "$yellow✥ Omitido IoT-Agent$NC"
-fi
-
-echo "$green
-<�| clawdbot instalado correctamente
-
-┬ Accede dese: http://<tu-ip>:8765
-  (Ejecuta 'ip addrr' or 'ifconfig' para ver tu IP)
-
-┌ Comandos:
-  clawdbot start   # Iniciar agente
-  clawdbot stop    # Detener agente
-  clawdbot status   # Ver estado
-
-┒ Tu privacidad:
-  · Nada se envía a servedores externos sin tu permiso explícito
-  • Todos los datos permanecen en tu máquina
-  • Të controlas cada acción del agente
-
-┢ 🜠 DMisrfruta de tu Multi-Agente autónomo!
+┬ Accede a http://<tu-ip>:8765
+┢ Tu datos nunca salen de tu máquina sin tu permiso explícito
+┢ Cada agente te pegará permiso antes de actuar
+┢ Codigo abierto MIT - https://github.com/leonardospain/clawdbot-free
 $nc"
