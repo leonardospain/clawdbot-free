@@ -23,3 +23,7 @@ v0.3
 - tool shell y docker existen
 - Siempre piden confirmación
 - Se aplica allowlist de comandos
+
+v0.4
+- El plan usa campos estructurados por tool
+- file_write_workspace y file_read son seguros por defecto

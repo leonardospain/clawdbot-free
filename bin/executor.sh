@@ -36,14 +36,12 @@ is_allowed_docker() {
   esac
 }
 
-log "Executor v0.3"
+log "Executor v0.4"
 log "Plan: ${PLAN}"
 
-python3 - <<'PY' "${PLAN}" "${WORKSPACE_DIR}" 2>/dev/null > "${WORKSPACE_DIR}/output/steps.ndjson"
+python3 - <<'PY' "${PLAN}" > "${WORKSPACE_DIR}/output/steps.ndjson"
 import json,sys
-plan_path=sys.argv[1]
-workspace=sys.argv[2]
-plan=json.load(open(plan_path))
+plan=json.load(open(sys.argv[1]))
 for step in plan.get("steps",[]):
     print(json.dumps(step, ensure_ascii=False))
 PY
@@ -55,65 +53,112 @@ d=json.loads(sys.argv[1])
 print(d.get("tool",""))
 PY
 )"
-  action="$(python3 - <<'PY' "$step"
+
+  log "Tool: ${tool}"
+
+  if [ "${tool}" = "file_write_workspace" ]; then
+    relpath="$(python3 - <<'PY' "$step"
 import json,sys
 d=json.loads(sys.argv[1])
-print(d.get("action",""))
+print(d.get("path",""))
 PY
 )"
-  req="$(python3 - <<'PY' "$step"
+    content="$(python3 - <<'PY' "$step"
 import json,sys
 d=json.loads(sys.argv[1])
-print("1" if d.get("requires_confirmation",False) else "0")
+print(d.get("content",""))
 PY
 )"
+    if [ -z "${relpath}" ]; then
+      log "BLOQUEADO: falta path"
+      continue
+    fi
+    if echo "${relpath}" | grep -qE '^\.\.|/'; then
+      log "BLOQUEADO: path inválido"
+      continue
+    fi
+    out="${WORKSPACE_DIR}/${relpath}"
+    mkdir -p "$(dirname "${out}")"
+    printf '%s\n' "${content}" > "${out}"
+    log "OK: escrito ${relpath}"
+    continue
+  fi
 
-  log "Paso: ${action} [${tool}]"
-
-  if [ "${tool}" = "file" ]; then
-    printf '%s\n' "${action}" >> "${WORKSPACE_DIR}/output/result.txt"
-    log "OK: escrito en workspace"
+  if [ "${tool}" = "file_read" ]; then
+    relpath="$(python3 - <<'PY' "$step"
+import json,sys
+d=json.loads(sys.argv[1])
+print(d.get("path",""))
+PY
+)"
+    if [ -z "${relpath}" ]; then
+      log "BLOQUEADO: falta path"
+      continue
+    fi
+    if echo "${relpath}" | grep -qE '^\.\.|/'; then
+      log "BLOQUEADO: path inválido"
+      continue
+    fi
+    inp="${WORKSPACE_DIR}/${relpath}"
+    if [ ! -f "${inp}" ]; then
+      log "BLOQUEADO: no existe ${relpath}"
+      continue
+    fi
+    head -c 2000 "${inp}" > "${WORKSPACE_DIR}/output/read_preview.txt" || true
+    log "OK: preview en output/read_preview.txt"
     continue
   fi
 
   if [ "${tool}" = "shell" ]; then
-    cmd="${action}"
+    cmd="$(python3 - <<'PY' "$step"
+import json,sys
+d=json.loads(sys.argv[1])
+print(d.get("cmd",""))
+PY
+)"
+    if [ -z "${cmd}" ]; then
+      log "BLOQUEADO: falta cmd"
+      continue
+    fi
     first="${cmd%% *}"
-
     if ! is_allowed_shell "${first}"; then
       log "BLOQUEADO: shell no permitido: ${first}"
       continue
     fi
-
     if ! confirm "Confirmar ejecutar shell: ${cmd}"; then
       log "CANCELADO: ${cmd}"
       continue
     fi
-
     log "RUN: ${cmd}"
     (cd "${WORKSPACE_DIR}" && bash -lc "${cmd}") >> "${LOG_FILE}" 2>&1 || log "ERROR: comando falló"
     continue
   fi
 
   if [ "${tool}" = "docker" ]; then
-    cmd="${action}"
-
+    cmd="$(python3 - <<'PY' "$step"
+import json,sys
+d=json.loads(sys.argv[1])
+print(d.get("cmd",""))
+PY
+)"
+    if [ -z "${cmd}" ]; then
+      log "BLOQUEADO: falta cmd"
+      continue
+    fi
     if ! is_allowed_docker ${cmd}; then
       log "BLOQUEADO: docker no permitido: ${cmd}"
       continue
     fi
-
     if ! confirm "Confirmar ejecutar docker: ${cmd}"; then
       log "CANCELADO: ${cmd}"
       continue
     fi
-
     log "RUN: ${cmd}"
     (cd "${WORKSPACE_DIR}" && bash -lc "${cmd}") >> "${LOG_FILE}" 2>&1 || log "ERROR: comando falló"
     continue
   fi
 
-  log "BLOQUEADO: herramienta no permitida"
+  log "BLOQUEADO: tool desconocida"
 done < "${WORKSPACE_DIR}/output/steps.ndjson"
 
 log "FIN"
