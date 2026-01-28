@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="v2.0.1"
+VERSION="v2.0.2"
 INSTALL_DIR="${HOME}/.clawdbot"
 LOG_FILE="${INSTALL_DIR}/install.log"
 DRY_RUN="${DRY_RUN:-0}"
 MODE="${1:-install}"
 
-log() {
-  mkdir -p "${INSTALL_DIR}" >/dev/null 2>&1 || true
-  touch "${LOG_FILE}" >/dev/null 2>&1 || true
-  printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" | tee -a "${LOG_FILE}" >/dev/null
-}
+mkdir -p "${INSTALL_DIR}" 2>/dev/null || true
+touch "${LOG_FILE}" 2>/dev/null || true
+
+log() { printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" | tee -a "${LOG_FILE}"; }
 
 run() {
   log "RUN: $*"
@@ -22,29 +21,22 @@ run() {
   "$@"
 }
 
-detect_platform() {
-  local os
-  os="$(uname -s 2>/dev/null || echo unknown)"
-  case "${os}" in
-    Linux)  echo "linux" ;;
-    Darwin) echo "macos" ;;
-    *)      echo "unknown" ;;
-  esac
-}
-
 audit_mode() {
-  cat <<EOF2
+  cat <<EOF_AUDIT
 === AUDIT clawdbot-free ${VERSION} ===
 Rutas que crea:
-  ${HOME}/.clawdbot/
-  ${HOME}/.clawdbot/workspace/
-  ${HOME}/.clawdbot/templates/
-  ${HOME}/.clawdbot/install.log
+  ${INSTALL_DIR}/
+  ${INSTALL_DIR}/workspace/
+  ${INSTALL_DIR}/templates/
+  ${INSTALL_DIR}/bin/
+  ${LOG_FILE}
 
 Acciones:
   - Detecta plataforma con uname -s
   - Si falta ollama y la plataforma es linux o macos, descarga e instala desde:
       https://ollama.ai/install.sh
+  - Copia binarios desde el repo a ${INSTALL_DIR}/bin
+  - Copia docker-compose.yml desde el repo a ${INSTALL_DIR}/docker-compose.yml
   - No usa sudo
   - No modifica .bashrc ni .zshrc
   - No abre firewall
@@ -54,7 +46,7 @@ Modos:
   --audit
   --dry-run
   --uninstall
-EOF2
+EOF_AUDIT
   exit 0
 }
 
@@ -63,63 +55,62 @@ uninstall() {
   printf 'Confirmar borrado total de %s ? [s/N]: ' "${INSTALL_DIR}"
   read -r CONFIRM
   case "${CONFIRM}" in
-    s|S) ;;
-    *) log "UNINSTALL: cancelado"; exit 0 ;;
+    s|S) run rm -rf "${INSTALL_DIR}"; log "UNINSTALL: completado" ;;
+    *) log "UNINSTALL: cancelado" ;;
   esac
-
-  if [ "${DRY_RUN}" = "1" ]; then
-    printf '[DRY_RUN] rm -rf %s\n' "${INSTALL_DIR}"
-    exit 0
-  fi
-
-  rm -rf "${INSTALL_DIR}"
-  log "UNINSTALL: completado"
   exit 0
 }
 
 install_ollama_if_missing() {
-  local platform
-  platform="$(detect_platform)"
-
   if command -v ollama >/dev/null 2>&1; then
     log "OLLAMA: ya existe"
     return 0
   fi
 
-  if [ "${platform}" != "linux" ] && [ "${platform}" != "macos" ]; then
-    log "ERROR: plataforma no soportada para instalar ollama. Usa Linux o macOS."
-    exit 1
-  fi
+  os="$(uname -s)"
+  case "${os}" in
+    Linux|Darwin) ;;
+    *) log "ERROR: plataforma no soportada para instalar ollama. Usa Linux o macOS."; exit 1 ;;
+  esac
 
   log "OLLAMA: instalando desde https://ollama.ai/install.sh"
   if [ "${DRY_RUN}" = "1" ]; then
     printf '[DRY_RUN] curl -fsSL https://ollama.ai/install.sh | bash\n'
     return 0
   fi
-
   curl -fsSL https://ollama.ai/install.sh | bash
   log "OLLAMA: instalado"
 }
 
 install() {
   log "INSTALL: clawdbot-free ${VERSION}"
+
   run mkdir -p "${INSTALL_DIR}"
   run mkdir -p "${INSTALL_DIR}/workspace"
   run mkdir -p "${INSTALL_DIR}/templates"
   run mkdir -p "${INSTALL_DIR}/bin"
-  if [ -f "/bin/clawdbot" ]; then
-    run cp "/bin/clawdbot" "/bin/clawdbot"
-    run chmod +x "/bin/clawdbot"
-    log "COPIA: clawdbot -> /bin/clawdbot"
+
+  if [ -f "${PWD}/bin/clawdbot" ]; then
+    run cp "${PWD}/bin/clawdbot" "${INSTALL_DIR}/bin/clawdbot"
+    run chmod +x "${INSTALL_DIR}/bin/clawdbot"
+    log "COPIA: clawdbot -> ${INSTALL_DIR}/bin/clawdbot"
+  else
+    log "AVISO: no existe ${PWD}/bin/clawdbot"
   fi
-  if [ -f "/bin/executor.sh" ]; then
-    run cp "/bin/executor.sh" "/bin/executor.sh"
-    run chmod +x "/bin/executor.sh"
-    log "COPIA: executor.sh -> /bin/executor.sh"
+
+  if [ -f "${PWD}/bin/executor.sh" ]; then
+    run cp "${PWD}/bin/executor.sh" "${INSTALL_DIR}/bin/executor.sh"
+    run chmod +x "${INSTALL_DIR}/bin/executor.sh"
+    log "COPIA: executor.sh -> ${INSTALL_DIR}/bin/executor.sh"
+  else
+    log "AVISO: no existe ${PWD}/bin/executor.sh"
   fi
-  if [ -f "/bin/validate_plan.py" ]; then
-    run cp "/bin/validate_plan.py" "/bin/validate_plan.py"
-    log "COPIA: validate_plan.py -> /bin/validate_plan.py"
+
+  if [ -f "${PWD}/bin/validate_plan.py" ]; then
+    run cp "${PWD}/bin/validate_plan.py" "${INSTALL_DIR}/bin/validate_plan.py"
+    log "COPIA: validate_plan.py -> ${INSTALL_DIR}/bin/validate_plan.py"
+  else
+    log "AVISO: no existe ${PWD}/bin/validate_plan.py"
   fi
 
   install_ollama_if_missing
@@ -127,12 +118,14 @@ install() {
   if [ -f "${PWD}/docker-compose.yml" ]; then
     run cp "${PWD}/docker-compose.yml" "${INSTALL_DIR}/docker-compose.yml"
     log "COPIA: docker-compose.yml -> ${INSTALL_DIR}/docker-compose.yml"
+  else
+    log "AVISO: no existe ${PWD}/docker-compose.yml"
   fi
 
   log "INSTALL: completado"
   log "Siguiente paso"
   log "Arranca: docker compose -f ${INSTALL_DIR}/docker-compose.yml up -d"
-  log "Comprueba: curl -fsSL http://localhost:11434/api/tags"
+  log "Diagnóstico: ${INSTALL_DIR}/bin/clawdbot doctor"
 }
 
 case "${MODE}" in
