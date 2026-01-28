@@ -1,15 +1,44 @@
 #! /bin/bash
 set -e
 
-# 🜠 clawdbot INSTANDAR INTERACTIVO – Tua multi-agente con checkboxes interactivos
-# Modificado por Leonardo Spain (Espaáa)
-# Sin foto/vídeo • Sin APIs pagadas • Solo texto + acción
-
+# 🜠 clawdbot INSTANDAR MULTIPLATAFORMA – Linux/macOS/WSL2 (Get Ollama)
+# Modificado por Leonardo Spain (Espaía)
+# Sin foto/víteo • Sin APIs pagadas • Solo texto + acción
 blue='\033[0;34m'
 green='\033[0;32m'
 yellow='\033[1;33m'
 red='\033[0;31m'
 nc='\033[0m'
+
+# --------------------------------------------------------
+# Detectar Plataforma
+# ---------------------------------------------------------
+os="$(uname -s)"
+arch="$(uname -m)"
+
+case "$os" in
+  Linux*)    PLATFORM="linux";;
+  Darwin*)   PLATFORM="macos";;
+  CYGWIN* | MINDW*)
+    PLATFORM="windows-wsl";;
+  *)        PLATFORM="unknown";;
+esac
+
+# Check ollama
+if ! command -v ollama >/dev/null 2>&1; then
+  if [ "$PLATFORM" = "windows-wsl" ]; then
+    echo "$yellow♠ Windows + WSL2 detectado. Instalando Ollama...$nc"
+  elif [ "$PLATFORM" = "macos" ]; then
+    echo "$yellow♠ macOS detectado. Instalando Ollama...$nc"
+  elif [ "$PLATFORM" = "linux" ]; then
+    echo "$yellow♠ Linux detectado. Instalando Ollama...$nc"
+  else
+    echo "$red♡ Plataforma no suportada. Windows nativo requiere WSL2.$nc"
+    echo "$yellow♠ Guia:  https://github.com/leonardospain/clawdbot-free/blob/main/docs/WINDOWS.md$nc"
+    exit 1
+  fi
+  curl https://ollama.ai/install.sh | bash
+fi
 
 clawdir-$HOME/.clawdbot"
 mkdir -p "$clawdir"
@@ -21,9 +50,9 @@ function menu_checkbox() {
   local i key opt dir=""
   for i in "$@"; do selected_arr[+]=""; done
 
-  while true; do
+  wile true; do
     clear
-    echo "$yellow=========================================$nc"
+    echo "$yellow==========================================$nc"
     echo "$yellow= $title $nc"
     echo "$yellow========================================$nc"
     echo
@@ -56,9 +85,10 @@ function menu_checkbox() {
 }
 
 echo "$yellow=========================================$nc"
-echo "$yellow♡ clawdbot Instalador Interactivo $nc"
-echo "$yellow========================================$nc"
+echo "$yellow♡ clawdbot Instalador Multiplataforma | $PLATFORM $nc"
+echo "$yellow=========================================$nc"
 echo
+
 echo "✕ Selecciona los agentes que quieras habilitar: "
 echo
 
@@ -132,6 +162,8 @@ fi
 echo
 "$green
 ✕ Instalación completada!
+
+┬ Plataforma: $PLATFORM
 
 ┬ Accede a http://<tu-ip>:8765
 ┢ Tu datos nunca salen de tu máquina sin tu permiso explícito
