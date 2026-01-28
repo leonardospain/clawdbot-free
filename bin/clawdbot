@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-INSTALL_DIR="/.clawdbot"
-WORKSPACE="/workspace"
-LOG_DIR="/logs"
-
-BIN_DIR="/bin"
-if [ -d "/bin" ]; then
-  REPO_BIN="/bin"
-else
-  REPO_BIN=""
-fi
-EXECUTOR="/executor.sh"
-VALIDATOR="/validate_plan.py"
-[ -f "" ] || EXECUTOR="/executor.sh"
-[ -f "" ] || VALIDATOR="/validate_plan.py"
+INSTALL_DIR="${HOME}/.clawdbot"
+WORKSPACE="${INSTALL_DIR}/workspace"
+LOG_DIR="${INSTALL_DIR}/logs"
 
 mkdir -p "${WORKSPACE}" "${LOG_DIR}"
+
+BIN_DIR="${INSTALL_DIR}/bin"
+if [ -d "${PWD}/bin" ]; then
+  REPO_BIN="${PWD}/bin"
+else
+  REPO_BIN="${BIN_DIR}"
+fi
+
+EXECUTOR="${BIN_DIR}/executor.sh"
+VALIDATOR="${BIN_DIR}/validate_plan.py"
+[ -f "${EXECUTOR}" ] || EXECUTOR="${REPO_BIN}/executor.sh"
+[ -f "${VALIDATOR}" ] || VALIDATOR="${REPO_BIN}/validate_plan.py"
 
 usage() {
   echo "Uso:"
@@ -40,6 +41,26 @@ slugify() {
   echo "$1" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//;s/-$//'
 }
 
+new_task_cmd() {
+  local task="${1:-}"
+  if [ -z "${task}" ]; then
+    echo "ERROR: falta tarea"
+    usage
+    exit 1
+  fi
+
+  local ts slug run_dir
+  ts="$(date '+%Y%m%d-%H%M%S')"
+  slug="$(slugify "${task}")"
+  [ -z "${slug}" ] && slug="task"
+  run_dir="${WORKSPACE}/${ts}-${slug}"
+
+  mkdir -p "${run_dir}/output" "${run_dir}/logs"
+  printf '%s\n' "${task}" > "${run_dir}/task.txt"
+
+  echo "${run_dir}"
+}
+
 doctor_cmd() {
   echo "Doctor"
   if command -v docker >/dev/null 2>&1; then echo "docker: OK"; else echo "docker: NO"; fi
@@ -48,8 +69,8 @@ doctor_cmd() {
   if [ -f "${INSTALL_DIR}/docker-compose.yml" ]; then echo "compose file: OK"; else echo "compose file: NO"; fi
   if curl -fsSL http://localhost:11434/api/tags >/dev/null 2>&1; then echo "ollama api: OK"; else echo "ollama api: NO"; fi
   if [ -x "${INSTALL_DIR}/bin/clawdbot" ]; then echo "clawdbot bin: OK"; else echo "clawdbot bin: NO"; fi
-  if [ -f "" ]; then echo "executor: OK"; else echo "executor: NO"; fi
-  if [ -f "${INSTALL_DIR}/bin/validate_plan.py" ]; then echo "validator: OK"; else echo "validator: NO"; fi
+  if [ -f "${EXECUTOR}" ]; then echo "executor: OK"; else echo "executor: NO"; fi
+  if [ -f "${VALIDATOR}" ]; then echo "validator: OK"; else echo "validator: NO"; fi
 }
 
 agent() {
@@ -62,14 +83,8 @@ agent() {
 
   require_ollama
 
-  local ts slug run_dir
-  ts="$(date '+%Y%m%d-%H%M%S')"
-  slug="$(slugify "${task}")"
-  [ -z "${slug}" ] && slug="task"
-  run_dir="${WORKSPACE}/${ts}-${slug}"
-
-  mkdir -p "${run_dir}/output" "${run_dir}/logs"
-  printf '%s\n' "${task}" > "${run_dir}/task.txt"
+  local run_dir
+  run_dir="$(new_task_cmd "${task}")"
 
   local prompt payload
   prompt=$(cat <<'P'
@@ -151,7 +166,7 @@ PY
   echo "OK: ${run_dir}"
   echo "Plan: ${run_dir}/plan.json"
 
-  if ! python3 "" "${run_dir}/plan.json" > "${run_dir}/logs/validate.log" 2>&1; then
+  if ! python3 "${VALIDATOR}" "${run_dir}/plan.json" > "${run_dir}/logs/validate.log" 2>&1; then
     echo "Plan inválido. Usando plan seguro"
     python3 - <<'PY' "${task}" > "${run_dir}/plan.json"
 import json,sys
@@ -161,7 +176,7 @@ PY
   fi
 
   echo "Ejecutando pasos seguros"
-  "" "${run_dir}/plan.json"
+  "${EXECUTOR}" "${run_dir}/plan.json"
 }
 
 status_cmd() {
@@ -190,6 +205,7 @@ purge_cmd() {
 cmd="${1:-}"
 shift || true
 case "${cmd}" in
+  new-task) new_task_cmd "${*:-}" ;;
   agent) agent "${*:-}" ;;
   status) status_cmd ;;
   doctor) doctor_cmd ;;
