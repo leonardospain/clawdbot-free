@@ -11,8 +11,8 @@ usage() {
   echo "Uso:"
   echo "  clawdbot agent \"tarea\""
   echo "  clawdbot status"
-  echo "  clawdbot logs"
   echo "  clawdbot doctor"
+  echo "  clawdbot logs"
   echo "  clawdbot purge"
 }
 
@@ -26,6 +26,18 @@ require_ollama() {
 
 slugify() {
   echo "$1" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//;s/-$//'
+}
+
+doctor_cmd() {
+  echo "Doctor"
+  if command -v docker >/dev/null 2>&1; then echo "docker: OK"; else echo "docker: NO"; fi
+  if docker compose version >/dev/null 2>&1; then echo "docker compose: OK"; else echo "docker compose: NO"; fi
+  if command -v python3 >/dev/null 2>&1; then echo "python3: OK"; else echo "python3: NO"; fi
+  if [ -f "${INSTALL_DIR}/docker-compose.yml" ]; then echo "compose file: OK"; else echo "compose file: NO"; fi
+  if curl -fsSL http://localhost:11434/api/tags >/dev/null 2>&1; then echo "ollama api: OK"; else echo "ollama api: NO"; fi
+  if [ -x "${INSTALL_DIR}/bin/clawdbot" ]; then echo "clawdbot bin: OK"; else echo "clawdbot bin: NO"; fi
+  if [ -f "${INSTALL_DIR}/bin/executor.sh" ]; then echo "executor: OK"; else echo "executor: NO"; fi
+  if [ -f "${INSTALL_DIR}/bin/validate_plan.py" ]; then echo "validator: OK"; else echo "validator: NO"; fi
 }
 
 agent() {
@@ -60,10 +72,8 @@ Formato requerido:
       "tool": "file_write_workspace|file_read|shell|docker",
       "requires_confirmation": false,
       "expected_output": "...",
-
       "path": "output/result.txt",
       "content": "texto",
-
       "cmd": "ls -la",
       "cwd": "workspace"
     }
@@ -72,12 +82,12 @@ Formato requerido:
 
 Reglas:
 - No inventes tools.
-- Para file_write_workspace: usa path y content. No uses action.
-- Para file_read: usa path. No uses action.
+- Para file_write_workspace: usa path y content.
+- Para file_read: usa path.
 - Para shell: usa cmd y pon requires_confirmation true.
 - Para docker: usa cmd y pon requires_confirmation true.
-- path siempre debe ser relativa dentro de workspace, por ejemplo output/result.txt.
-Devuelve SOLO JSON. Nada más.
+- path debe ser relativa dentro de workspace.
+Devuelve SOLO JSON.
 P
 )
 
@@ -127,11 +137,11 @@ PY
   fi
 
   echo "OK: ${run_dir}"
-  echo "Plan: /plan.json"
+  echo "Plan: ${run_dir}/plan.json"
 
-  if ! python3 "/bin/validate_plan.py" "/plan.json" > "/logs/validate.log" 2>&1; then
+  if ! python3 "${INSTALL_DIR}/bin/validate_plan.py" "${run_dir}/plan.json" > "${run_dir}/logs/validate.log" 2>&1; then
     echo "Plan inválido. Usando plan seguro"
-    python3 - <<'PY' "" > "/plan.json"
+    python3 - <<'PY' "${task}" > "${run_dir}/plan.json"
 import json,sys
 task=sys.argv[1]
 print(json.dumps({"goal": task, "steps": [{"id": 1, "tool": "file_write_workspace", "requires_confirmation": False, "expected_output": "Archivo output/result.txt", "path": "output/result.txt", "content": "placeholder"}]}, ensure_ascii=False, indent=2))
@@ -139,7 +149,7 @@ PY
   fi
 
   echo "Ejecutando pasos seguros"
-  "${PWD}/bin/executor.sh" "${run_dir}/plan.json"
+  "${INSTALL_DIR}/bin/executor.sh" "${run_dir}/plan.json"
 }
 
 status_cmd() {
