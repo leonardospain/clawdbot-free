@@ -18,3 +18,8 @@ Acciones prohibidas
 
 Regla base
 Si una acción no está listada, NO se ejecuta.
+
+v0.3
+- tool shell y docker existen
+- Siempre piden confirmación
+- Se aplica allowlist de comandos
