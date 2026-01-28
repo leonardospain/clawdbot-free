@@ -1,62 +1,53 @@
 # clawdbot-free
 
-clawdbot-free es un instalador local.
-Prepara la carpeta ~/.clawdbot, un stack Docker local gratis, y un modo Agent básico.
+Agente local, gratis y auditable.
+Funciona con Ollama local y ejecuta solo acciones permitidas por lista blanca.
 
-Estado hoy
-- Instalación local mínima
-- Auditoría y dry-run incluidos
-- Modo Agent v0.1 genera un plan JSON usando Ollama local
-- Sin promesas de funciones no implementadas
+Qué instala
+- Crea ~/.clawdbot/
+- Instala Ollama si falta, desde https://ollama.ai/install.sh
+- Copia docker-compose.yml y binarios a ~/.clawdbot/
+- No usa sudo
+- No modifica .bashrc ni .zshrc
+- No abre firewall
+- No crea servicios de arranque
 
-Requisitos
-- Linux o macOS
-- curl
-- Docker y Docker Compose para usar el stack
-
-Instalación
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash
-
-Auditoría
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash -s -- --audit
-
-Dry run
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | DRY_RUN=1 bash -s -- --dry-run
-
-Desinstalar
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash -s -- --uninstall
-
-Stack local gratis
-En el repo:
-- docker-compose.yml levanta ollama y redis
-- start.sh arranca el stack
-
-Modo Agent v0.1
-1) Arranca servicios
-docker compose -f ~/.clawdbot/docker-compose.yml up -d
-
-2) Ejecuta una tarea
-~/.clawdbot/bin/clawdbot agent "resume este texto en 5 puntos"
-
-3) Revisa salida
-ls -la ~/.clawdbot/workspace
+Qué hace hoy
+- Modo Agent
+  - Genera un plan JSON usando Ollama local
+  - Valida el plan
+  - Ejecuta solo acciones permitidas
+  - Pide confirmación para shell y docker
+  - Guarda todo en ~/.clawdbot/workspace
 
 Qué no hace
-- No envía emails
-- No integra calendarios
-- No hace reservas
-- No abre firewall
-- No modifica .bashrc ni .zshrc
+- No emails
+- No calendarios
+- No reservas
+- No scraping web por defecto
+- No APIs de pago
+
+Instalar
+curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash
+
+Arrancar stack
+docker compose -f ~/.clawdbot/docker-compose.yml up -d
+
+Diagnóstico
+~/.clawdbot/bin/clawdbot doctor
+
+Modo Agent
+~/.clawdbot/bin/clawdbot agent "resume este texto en 5 puntos"
+
+Auditoría rápida
+curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh -o install.sh
+bash -n install.sh
+less install.sh
 
 Docs
+- docs/QUICKSTART.md
 - docs/WHAT-IT-DOES.md
-- docs/MODE-AGENT-SPEC.md
-- docs/WINDOWS.md
-
-Modelo LLM
-Por defecto usa qwen2.5:1.5b.
-Descarga modelo:
-ollama pull qwen2.5:1.5b
-
-Cambiar modelo:
-CLAW_MODEL="qwen2.5:1.5b" ~/.clawdbot/bin/clawdbot agent "tarea"
+- docs/PLAN-FORMAT.md
+- docs/EXECUTOR-POLICY.md
+- docs/ALLOWLIST-COMMANDS.md
+- SECURITY.md
