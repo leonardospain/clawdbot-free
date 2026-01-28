@@ -1,30 +1,34 @@
-# 🦞 clawdbot-free v2.0 — Agente IA Multi-Paso
+# 🦞 clawdbot-free v2.0 — Multi-Agent Selector
 
-**clawdbot-free** es tu sistema de agentes de IA especializados con permiso explícito antes de cada acción. 100% libre, sin APIs pagadas, sin tarjetas.
+**clawdbot-free** es un instalador interactivo para configurar agentes de IA locales con Ollama. 100% libre, sin APIs pagadas, sin tarjetas.
 
 > Modificado por Leonardo Spain (España)
 
-## 🔑 ¿Qué es clawdbot-free v2.0?
+## ✅ Lo que HACE HOY
 
-Sistema multi-agente que ejecuta tareas completas con varios pasos:
+- 🧠 **Selector interactivo** de agentes especializados:
+  - Comms-Agent (Emails/Redes sociales)
+  - IoT-Agent (Control dispositivos locales)
+  - Secretary-Agent (Calendario básico, alertas)
+  - Research-Agent (Búsquedas web con DuckDuckGo/Brave)
+  - Alert-Agent (Notificaciones push)
+  - Planner-Agent (Divide objetivos en pasos con tu OK)
 
-- 🧠 **Coordinador**: decide qué agente usar según tu objetivo
-- 🔍 **Investigador**: busca datos actuales (precios, emergencias)
-- 📊 **Analista**: razonamiento profundo y comparaciones
-- ⚡ **Ejecutor**: sugiere acciones ("¿Reservo este hotel?")
-- 🧠 **Memoria**: recuerda tus preferencias (90 días)
-- 📋 **Planner-Agent**: divide objetivos en pasos con tu permiso
+- 📦 **Instalación automática** de Ollama si no está presente
+- 🌐 **Detección automática** de plataforma (Linux/macOS/WSL2)
+- 🌍 **Selector de idioma** (Español/Inglés/Rumano)
+- 🔒 **Configuración local** en `~/.clawdbot/config.json` (nunca envía datos sin tu OK)
+- ♻️ **Desinstalador limpio** (`uninstall.sh` borra ~/.clawdbot y wrapper)
 
-## ✅ Características
+## ❌ Lo que NO hace (aún)
 
-| Característica | Detalle |
-|----------------|---------|
-| **100% GRATIS** | Sin suscripciones, sin APIs pagadas |
-| **Multiplataforma** | Linux / macOS / Windows (WSL2) |
-| **Multilingüe** | Español / Inglés / Rumano |
-| **Privacidad total** | Tus datos nunca salen sin tu OK |
-| **Workspace aislado** | `~/.clawdbot/workspace/` |
-| **Mensajerías gratuitas** | Telegram / Discord / Matrix |
+- ❌ No scrapea Google Maps ni sitios web
+- ❌ No envía emails automáticamente
+- ❌ No integra calendarios (Google/Outlook)
+- ❌ No monitoriza respuestas de restaurantes/hoteles
+- ❌ No realiza reservas automáticas
+
+> Estas capacidades requerirían APIs pagadas o acceso a sistemas privados. Se evaluarán en futuras versiones con código 100% auditable.
 
 ## 🚀 Instalar
 
@@ -32,39 +36,35 @@ Sistema multi-agente que ejecuta tareas completas con varios pasos:
 curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash
 ```
 
-## ▶️ Usar
+## 🔍 Auditoría para usuarios desconfiados
 
 ```bash
-clawdbot start      # Iniciar
-clawdbot stop       # Detener
-clawdbot version    # Versión
-clawdbot update     # Actualizar (con tu OK)
-clawdbot uninstall  # Desinstalar
+# 1. Descargar SIN ejecutar:
+curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh -o install.sh
+
+# 2. Verificar sintaxis:
+bash -n install.sh
+
+# 3. Revisar contenido:
+less install.sh
+
+# 4. Buscar comandos peligrosos:
+grep -nE "rm -rf|sudo|chmod 777|curl.*http" install.sh
 ```
 
-## 🌐 Ejemplo compacto
+## 📄 Documentación
 
-```
-Tú: "Analiza https://syscomdigital.ro, detecta errores SEO"
-
-clawdbot:
-✅ Paso 1: Descargar HTML de https://syscomdigital.ro
-   ¿Permites? (S/n): S
-✅ Paso 2: Analizar estructura HTML
-✅ Paso 3: Generar informe en ~/.clawdbot/workspace/seo_report.md
-   ¿Guardar? (S/n): S
-✅ Informe generado
-```
+- [docs/WINDOWS.md](docs/WINDOWS.md): Guía WSL2 para Windows
 
 ## ⚠️ Filosofía 100% clara
 
 ✅ Todo lo que instalas es 100% gratis para siempre
 ✅ Sin tarjetas, sin pruebas, sin sorpresas
-✅ Tus datos nunca salen sin tu OK
-⚠️ Si una opción NO aparece: no es 100% gratis o seguro
+✅ Tus datos nunca salen de tu máquina sin tu OK explícito
+⚠️ Si una opción NO aparece en el instalador: no es 100% gratis o seguro
 
 ## 🔍 SEO
 
-clawdbot, clawdbot-free, multi-agente, agente IA, LLM local, privacidad IA, España, Leonardo Spain
+clawdbot, clawdbot-free, multi-agente, LLM local, Ollama, privacidad IA, España, Leonardo Spain
 
 > ✉️ https://github.com/leonardospain/clawdbot-free
