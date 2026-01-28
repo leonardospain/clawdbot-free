@@ -12,6 +12,7 @@ usage() {
   echo "  clawdbot agent \"tarea\""
   echo "  clawdbot status"
   echo "  clawdbot logs"
+  echo "  clawdbot doctor"
   echo "  clawdbot purge"
 }
 
@@ -169,6 +170,7 @@ shift || true
 case "${cmd}" in
   agent) agent "${*:-}" ;;
   status) status_cmd ;;
+  doctor) doctor_cmd ;;
   logs) logs_cmd ;;
   purge) purge_cmd ;;
   *) usage; exit 1 ;;

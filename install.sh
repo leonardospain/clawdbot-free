@@ -107,10 +107,19 @@ install() {
   run mkdir -p "${INSTALL_DIR}/workspace"
   run mkdir -p "${INSTALL_DIR}/templates"
   run mkdir -p "${INSTALL_DIR}/bin"
-  if [ -f "${PWD}/bin/clawdbot" ]; then
-    run cp "${PWD}/bin/clawdbot" "${INSTALL_DIR}/bin/clawdbot"
-    run chmod +x "${INSTALL_DIR}/bin/clawdbot"
-    log "COPIA: clawdbot -> ${INSTALL_DIR}/bin/clawdbot"
+  if [ -f "/bin/clawdbot" ]; then
+    run cp "/bin/clawdbot" "/bin/clawdbot"
+    run chmod +x "/bin/clawdbot"
+    log "COPIA: clawdbot -> /bin/clawdbot"
+  fi
+  if [ -f "/bin/executor.sh" ]; then
+    run cp "/bin/executor.sh" "/bin/executor.sh"
+    run chmod +x "/bin/executor.sh"
+    log "COPIA: executor.sh -> /bin/executor.sh"
+  fi
+  if [ -f "/bin/validate_plan.py" ]; then
+    run cp "/bin/validate_plan.py" "/bin/validate_plan.py"
+    log "COPIA: validate_plan.py -> /bin/validate_plan.py"
   fi
 
   install_ollama_if_missing
