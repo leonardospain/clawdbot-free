@@ -1,53 +1,80 @@
-# clawdbot-free
+# LeonAgent 🦀
 
-Agente local, gratis y auditable.
-Funciona con Ollama local y ejecuta solo acciones permitidas por lista blanca.
+UPDATE DAILY
 
-Qué instala
-- Crea ~/.clawdbot/
-- Instala Ollama si falta, desde https://ollama.ai/install.sh
-- Copia docker-compose.yml y binarios a ~/.clawdbot/
-- No usa sudo
-- No modifica .bashrc ni .zshrc
-- No abre firewall
-- No crea servicios de arranque
+## Qué es LeonAgent
 
-Qué hace hoy
-- Modo Agent
-  - Genera un plan JSON usando Ollama local
-  - Valida el plan
-  - Ejecuta solo acciones permitidas
-  - Pide confirmación para shell y docker
-  - Guarda todo en ~/.clawdbot/workspace
+LeonAgent es un agente de línea de comandos para ejecutar tareas de forma estructurada, controlada y reproducible.
 
-Qué no hace
-- No emails
-- No calendarios
-- No reservas
-- No scraping web por defecto
-- No APIs de pago
+Trabaja a partir de planes explícitos.
+Aplica reglas claras de ejecución.
+Registra cada acción.
 
-Instalar
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh | bash
+El foco está en control, trazabilidad y seguridad.
+No es un chatbot.
+No improvisa.
 
-Arrancar stack
-docker compose -f ~/.clawdbot/docker-compose.yml up -d
+## Para quién es
 
-Diagnóstico
-~/.clawdbot/bin/clawdbot doctor
+LeonAgent es para personas técnicas que necesitan ejecutar tareas con control total.
 
-Modo Agent
-~/.clawdbot/bin/clawdbot agent "resume este texto en 5 puntos"
+Aplica a desarrolladores.
+Aplica a equipos de automatización.
+Aplica a entornos donde un error cuesta tiempo o dinero.
 
-Auditoría rápida
-curl -fsSL https://raw.githubusercontent.com/leonardospain/clawdbot-free/main/install.sh -o install.sh
-bash -n install.sh
-less install.sh
+No está pensado para uso casual.
+No está pensado para conversación libre.
 
-Docs
-- docs/QUICKSTART.md
-- docs/WHAT-IT-DOES.md
-- docs/PLAN-FORMAT.md
-- docs/EXECUTOR-POLICY.md
-- docs/ALLOWLIST-COMMANDS.md
-- SECURITY.md
+## Qué problema resuelve
+
+LeonAgent resuelve el problema de ejecutar tareas complejas sin control ni contexto.
+
+Evita acciones implícitas.
+Evita decisiones opacas.
+Evita ejecuciones no reproducibles.
+
+Cada tarea parte de un plan.
+Cada paso queda registrado.
+Cada acción sigue reglas explícitas.
+
+## Qué hace hoy
+
+LeonAgent ejecuta tareas a partir de planes definidos por el usuario.
+
+Lee planes estructurados.
+Valida cada paso antes de ejecutar.
+Ejecuta comandos permitidos.
+Registra entradas, salidas y errores.
+
+El usuario mantiene control total del flujo.
+No hay ejecución automática sin plan.
+
+## Qué NO hace
+
+LeonAgent no toma decisiones por su cuenta.
+No ejecuta acciones sin un plan definido.
+No aprende ni modifica su comportamiento.
+
+No es un asistente conversacional.
+No reemplaza criterio humano.
+No actúa fuera de las reglas configuradas.
+
+## Requisitos
+
+Node.js instalado.
+Shell compatible con bash.
+Sistema macOS o Linux.
+Permisos de ejecución en scripts.
+Acceso a terminal.
+
+## Instalación rápida
+
+## Primer uso
+
+## Estructura del proyecto
+
+## Documentación
+
+## Seguridad
+
+## Licencia
